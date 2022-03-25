@@ -1,10 +1,17 @@
 
+use tokio::runtime::{Runtime, Builder};
+
 use htir::*;
 
-#[tokio::main(flavor = "current_thread")]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    
-    println!("Hello, client!");
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let rt = Builder::new_current_thread()
+      .build()?;
+
+    rt.block_on(async {
+      
+      println!("Hello async client runtime!");
+
+    });
 
     Ok(())
 }
