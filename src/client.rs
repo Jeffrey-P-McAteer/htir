@@ -1,5 +1,5 @@
 
-use tokio::runtime::{Runtime, Builder};
+use tokio::runtime::{Builder};
 
 use htir::*;
 
@@ -8,7 +8,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
       .build()?;
 
     rt.block_on(async {
-      
+      let _ = config::read_config(Some(""));
+
       println!("Hello async client runtime!");
 
     });

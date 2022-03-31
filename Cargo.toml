@@ -20,6 +20,9 @@ path = "src/client.rs"
 tokio = { version = "1", features = ["full"] }
 sqlite = "0.26"
 
+dirs = "4.0"
+
+
 
 
 
