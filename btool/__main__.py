@@ -48,7 +48,7 @@ HTIR_app = None
 if is_macos_host():
   # use client_exe to create target/HTIR.app, a directory
   # conforming to apple's app setup.
-  HTIR_app = os.path.join('target', 'release', 'HTIR.app')
+  HTIR_app = os.path.abspath( os.path.join('target', 'release', 'HTIR.app') )
   os.makedirs(HTIR_app, exist_ok=True)
   try:
     shutil.copy(client_exe, os.path.join(HTIR_app, 'HTIR'))
