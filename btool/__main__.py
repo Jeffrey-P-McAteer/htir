@@ -60,7 +60,7 @@ for file in os.listdir('examples'):
   except:
     traceback.print_exc()
 
-
+print('')
 print('Killing server...')
 sproc.kill()
 
