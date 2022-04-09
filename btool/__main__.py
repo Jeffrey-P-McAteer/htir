@@ -37,14 +37,18 @@ client_exe = os.path.join('target', 'release', 'client' if not is_windows_host()
 
 print('')
 
-sproc = subprocess.Popen([server_exe], cwd=os.path.join('.'))
+server_cmd = [server_exe]
+print('Spawning background command: {}'.format(' '.join(server_cmd)))
+sproc = subprocess.Popen(server_cmd, cwd=os.path.join('.'))
 
 try:
-  subprocess.run([client_exe] + list(sys.argv[1:]) , cwd=os.path.join('.'))
+  client_cmd = [client_exe] + list(sys.argv[1:])
+  print('Running client command: {}'.format(' '.join(client_cmd)))
+  subprocess.run(client_cmd, cwd=os.path.join('.'))
 except:
   traceback.print_exc()
 
-
+print('')
 print('Executing all example scripts...')
 for file in os.listdir('examples'):
   cmd = []
