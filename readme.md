@@ -52,7 +52,7 @@ Benefits which _could_ be designed in but are explicitly _not_:
 
  - [ ] Async by default (try to use all HW cores available in server, single-thread in client)
  - [ ] Use libucl for server & client configuration: https://docs.rs/libucl/latest/libucl/
- - [ ] `// TODO`
+ - [ ] Client GUIs for windows, macos, linux, and the BSDs
 
 
 # Design
@@ -94,4 +94,15 @@ Benefits which _could_ be designed in but are explicitly _not_:
 
 
 ```
+
+## GUI support
+
+ - `cfg(target_os = "windows")`
+    - we will use win32 bindings (from the `winapi` and `winsafe` crates) to provide graphics (win32 ships on all windows OSes)
+ - `cfg(target_os = "macos")`
+    - we will use Cocoa bindings (from the `cacao` crate) to provide graphics (Cocoa ships on all macos OSes)
+ - `cfg(any(target_os = "linux", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))`
+    - we will use gtk4 to provide graphics; this means development and client machines need `gtk4` installed and available.
+
+
 

@@ -39,7 +39,9 @@ fn cli_main(url: &str, _args: &Args) {
 
 fn gui_main(args: &Args) {
   println!("Hello async gui_main runtime!");
-  gui::gui::open_gui(args);
+  if let Err(e) = gui::gui::open_gui(args) {
+    println!("Error running gui: {:?}", e);
+  }
 }
 
 
