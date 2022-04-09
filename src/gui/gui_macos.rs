@@ -42,7 +42,7 @@ impl AppDelegate for BasicApp {
         MenuItem::Quit,
       ]);
 
-      return m;
+      return Some(m);
     }
 }
 
