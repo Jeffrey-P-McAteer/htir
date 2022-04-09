@@ -106,7 +106,7 @@ def gen_icons():
   for w, h in icon_sizes:
     icon_png = next( icon_pngs([(w, h)]) )
     img.add_media(key='icon_{}x{}'.format(w, h), file=icon_png)
-  img.write(icon_icns)
+  img.write(icon_icns, toc=True)
 
   # Just for jeff to inspect stuff
   if '/j/' in os.environ.get('HOME', ''):
