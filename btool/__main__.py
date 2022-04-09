@@ -82,7 +82,8 @@ def poll_fifo_write_to_stdout(fifo_file=None):
 
   with open(fifo_file, 'r') as fd:
     while not os.path.exists(child_poll_exit_flag_file):
-      select.select([fd],[],[fd]) # Wait until I/O available
+      #select.select([fd],[],[fd]) # Wait until I/O available
+      time.sleep(0.05)
       data = fd.read()
       if len(data) > 0:
         sys.stdout.write(data)
