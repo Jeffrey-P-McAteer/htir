@@ -7,7 +7,7 @@ pub mod config {
 
   #[derive(Default, Debug, Copy, Clone)]
   pub struct Config {
-
+    pub some_option: f64,
 
   }
 
