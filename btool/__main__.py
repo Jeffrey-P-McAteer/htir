@@ -13,6 +13,7 @@ import platform
 import threading
 import select
 import time
+import multiprocessing
 
 def is_windows_host():
   return os.name == 'nt'
@@ -74,20 +75,24 @@ try:
     if not os.path.exists(stderr_fifo):
       os.mkfifo(stderr_fifo)
 
-    # Spawn a thread to poll each FIFO object
-    os.environ['KILL_POLL_FIFO_T'] = 'f'
-    def poll_fifo_write_to(fifo_file, out):
+    child_poll_exit_flag_file = os.path.abspath( os.path.join('target', 'htir_app_io_children_exit_pls.txt') )
+    if os.path.exists(child_poll_exit_flag_file):
+      os.remove(child_poll_exit_flag_file)
+
+    # Spawn a process to poll each FIFO object
+    def poll_fifo_write_to_stdout(fifo_file):
       with open(fifo_file, 'r') as fd:
-        while not 't' in os.environ.get('KILL_POLL_FIFO_T', ''):
+        while not os.path.exists(child_poll_exit_flag_file):
           select.select([fd],[],[fd]) # Wait until I/O available
           data = fd.read()
           if len(data) > 0:
-            out.write(data)
+            sys.stdout.write(data)
+            sys.stdout.flush()
 
 
-    t1 = threading.Thread(target=poll_fifo_write_to, args=(stdout_fifo, sys.stdout))
+    t1 = multiprocessing.Process(target=poll_fifo_write_to_stdout, args=(stdout_fifo,))
     t1.start()
-    t2 = threading.Thread(target=poll_fifo_write_to, args=(stderr_fifo, sys.stderr))
+    t2 = multiprocessing.Process(target=poll_fifo_write_to_stdout, args=(stderr_fifo,))
     t2.start()
 
     client_cmd = [
@@ -101,8 +106,9 @@ try:
 
     print('Running MacOS client app: {}'.format(' '.join(client_cmd)))
     subprocess.run(client_cmd, cwd=os.path.join('.'))
-    os.environ['KILL_POLL_FIFO_T'] = 'true'
-    time.sleep(0.1)
+    
+    with open(child_poll_exit_flag_file, 'w') as fd:
+      fd.write('1')
 
   else:
     client_cmd = [client_exe] + list(sys.argv[1:])
