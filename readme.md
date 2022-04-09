@@ -87,13 +87,21 @@ Benefits which _could_ be designed in but are explicitly _not_:
 
 `// TODO`
 
-# Example Config
+# Build Steps
+
+`// TODO`
+
+# Examples
+
+## Example Config
 
 ```ucl
 
 
 
 ```
+
+# Misc
 
 ## GUI support
 
@@ -103,6 +111,4 @@ Benefits which _could_ be designed in but are explicitly _not_:
     - we will use Cocoa bindings (from the `cacao` crate) to provide graphics (Cocoa ships on all macos OSes)
  - `cfg(any(target_os = "linux", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))`
     - we will use gtk4 to provide graphics; this means development and client machines need `gtk4` installed and available.
-
-
 

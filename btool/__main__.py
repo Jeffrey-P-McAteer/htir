@@ -20,17 +20,20 @@ for _ in range(0, 12):
 
 subprocess.run(['cargo', 'build', '--release'], check=True)
 
-subprocess.run(['cargo', 'build', '--release'], check=True, cwd='htir_py')
-library_renames = [('libhtir.so', 'htir.so')]
-for name, target_name in library_renames:
-  full_path = os.path.join('htir_py', 'target', 'release', name)
-  if os.path.exists(full_path):
-    target_path = os.path.join('htir_py', 'target', 'release', target_name)
-    print('Copying {} to {} so python import will find it...'.format(full_path, target_path))
-    try:
-      shutil.copy(full_path, target_path)
-    except shutil.SameFileError:
-      pass # why bother? Ugh.
+try:
+  subprocess.run(['cargo', 'build', '--release'], check=True, cwd='htir_py')
+  library_renames = [('libhtir.so', 'htir.so')]
+  for name, target_name in library_renames:
+    full_path = os.path.join('htir_py', 'target', 'release', name)
+    if os.path.exists(full_path):
+      target_path = os.path.join('htir_py', 'target', 'release', target_name)
+      print('Copying {} to {} so python import will find it...'.format(full_path, target_path))
+      try:
+        shutil.copy(full_path, target_path)
+      except shutil.SameFileError:
+        pass # why bother? Ugh.
+except:
+  traceback.print_exc()
 
 server_exe = os.path.join('target', 'release', 'server' if not is_windows_host() else 'server.exe')
 client_exe = os.path.join('target', 'release', 'client' if not is_windows_host() else 'client.exe')
