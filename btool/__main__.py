@@ -112,7 +112,6 @@ try:
     client_cmd = [
       '/usr/bin/open',
       '-W', # Wait for app to close
-      '--stdin', '/dev/stdin',     # Forward stdin
       '--stdout', stdout_fifo,     # Forward stdout (causes permission errors if /dev/stdout)
       '--stderr', stderr_fifo,     # Forward stderr (causes permission errors if /dev/stderr)
       '-a', HTIR_app, # -a <application>.app
@@ -122,7 +121,8 @@ try:
     #subprocess.run(client_cmd, cwd=os.path.join('.'))
     client_p = subprocess.Popen(client_cmd, cwd=os.path.join('.'))
 
-    while client_p.returncode is None:
+    while client_p.poll() is None:
+      sys.stdout.flush()
       time.sleep(0.05)
 
     print('Client app exited with {}'.format(client_p.returncode))
