@@ -92,6 +92,8 @@ if is_macos_host():
   print('MacOS .app created at {}'.format(HTIR_app))
 
 print('')
+print('HTIR Server and Client application built, running tests....')
+print('')
 
 server_cmd = [server_exe]
 print('Spawning background server: {}'.format(' '.join(server_cmd)))
