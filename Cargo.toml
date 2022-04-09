@@ -1,5 +1,8 @@
 [package]
 name = "htir"
+authors = [
+  "Jeffrey McAteer <jeffrey.p.mcateer@gmail.com>"
+]
 version = "0.1.0"
 edition = "2021"
 
@@ -21,7 +24,12 @@ tokio = { version = "1", features = ["full"] }
 sqlite = "0.26"
 
 dirs = "4.0"
+clap = { version = "3.1", features = ["derive"] }
 
+
+
+[target.x86_64-pc-windows-gnu.dependencies]
+winapi = {version = "0.3", features = ["wincon", "winuser"]}
 
 
 
