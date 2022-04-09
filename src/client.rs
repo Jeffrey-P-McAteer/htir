@@ -2,21 +2,9 @@
 use tokio::runtime::{Builder};
 use clap::Parser;
 
+
 use htir::*;
-
-#[derive(Parser, Debug, Default)]
-#[clap(author, version, about, long_about = None)]
-pub struct Args {
-  #[clap(short, long)]
-  pub open_gui: bool,
-
-  #[clap(short, long)]
-  pub debug: bool,
-
-  pub url: Option<String>,
-
-}
-
+use htir::config::Args;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
   let args = Args::parse();
@@ -50,13 +38,8 @@ fn cli_main(url: &str, _args: &Args) {
 }
 
 fn gui_main(args: &Args) {
-  if !args.debug {
-    util::conditional_hide_console_if_double_clicked_on_windows();
-  }
   println!("Hello async gui_main runtime!");
-
-
-
+  gui::gui::open_gui(args);
 }
 
 
