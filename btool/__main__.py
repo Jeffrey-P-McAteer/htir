@@ -62,10 +62,17 @@ if is_macos_host():
   # conforming to apple's app setup.
   HTIR_app = os.path.abspath( os.path.join('target', 'release', 'HTIR.app') )
   os.makedirs(HTIR_app, exist_ok=True)
-  try:
-    shutil.copy(client_exe, os.path.join(HTIR_app, 'HTIR'))
-  except shutil.SameFileError:
-    pass # why bother? Ugh.
+  os.makedirs(os.path.join(HTIR_app, 'Contents', 'Resources'), exist_ok=True)
+  
+  files_to_copy = [
+    (client_exe, os.path.join(HTIR_app, 'HTIR')),
+    (os.path.join('target', 'HTIR.icns'), os.path.join(HTIR_app, 'Contents', 'Resources', 'AppIcon.icns')),
+  ]
+  for src_f, dst_f in files_to_copy:
+    try:
+      shutil.copy(src_f, dst_f)
+    except shutil.SameFileError:
+      pass # why bother? Ugh.
   print('MacOS .app created at {}'.format(HTIR_app))
 
 print('')
