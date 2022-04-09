@@ -44,8 +44,8 @@ except:
   traceback.print_exc()
 
 
-server_exe = os.path.join('target', 'release', 'server' if not is_windows_host() else 'server.exe')
-client_exe = os.path.join('target', 'release', 'client' if not is_windows_host() else 'client.exe')
+server_exe = os.path.abspath( os.path.join('target', 'release', 'server' if not is_windows_host() else 'server.exe') )
+client_exe = os.path.abspath( os.path.join('target', 'release', 'client' if not is_windows_host() else 'client.exe') )
 
 HTIR_app = None
 if is_macos_host():
