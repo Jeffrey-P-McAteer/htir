@@ -73,7 +73,8 @@ def poll_fifo_write_to_stdout(fifo_file=None):
   import os
   import sys
   import select
-
+  import time
+  
   if fifo_file is None:
     fifo_file = sys.argv[1]
   
