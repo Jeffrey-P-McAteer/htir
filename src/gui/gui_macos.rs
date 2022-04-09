@@ -1,7 +1,7 @@
 
 use crate::config::Args;
 
-use cacao::macos::{App, AppDelegate};
+use cacao::macos::{App, AppDelegate, Menu, MenuItem};
 use cacao::macos::window::Window;
 
 pub fn open_gui(_args: &Args) -> Result<(), Box<dyn std::error::Error>> {
@@ -29,6 +29,20 @@ impl AppDelegate for BasicApp {
     fn should_terminate_after_last_window_closed(&self) -> bool {
       println!("BasicApp.should_terminate_after_last_window_closed()");
       return true;
+    }
+    fn dock_menu(&self) -> Option<Menu> {
+      println!("BasicApp.dock_menu()");
+
+      let m = Menu::new("HTIR", vec![
+        MenuItem::New("Hello World Menu Item").action(|| {
+          println!("Hello World Menu Item clicked!");
+        }),
+        MenuItem::EnterFullScreen,
+        MenuItem::CloseWindow,
+        MenuItem::Quit,
+      ]);
+
+      return m;
     }
 }
 
