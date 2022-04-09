@@ -1,7 +1,35 @@
 
 use crate::config::Args;
 
+use gtk4::prelude::*;
+use gtk4::{Application, ApplicationWindow, Button};
+
 pub fn open_gui(_args: &Args) -> Result<(), Box<dyn std::error::Error>> {
-  std::unimplemented!()
+  let application = Application::builder()
+      .application_id("com.example.FirstGtkApp")
+      .build();
+
+  application.connect_activate(|app| {
+      let window = ApplicationWindow::builder()
+          .application(app)
+          .title("First GTK Program")
+          .default_width(350)
+          .default_height(70)
+          .build();
+
+      let button = Button::with_label("Click me!");
+      button.connect_clicked(|_| {
+          eprintln!("Clicked!");
+      });
+      window.set_child(Some(&button));
+
+      window.show();
+  });
+
+  application.run();
+  
+  Ok(())
 }
+
+
 
