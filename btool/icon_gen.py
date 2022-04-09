@@ -25,12 +25,17 @@ def import_maybe_installing_with_pip(import_name, pkg_name=None):
   return importlib.import_module(import_name)
 
 def gen_icons():
-  icon_png = os.path.abspath(os.path.join('target', 'HTIR.png'))
+  
+  def icon_pngs(sizes):
+    for w,h in sizes:
+      yield os.path.abspath(os.path.join('target', 'HTIR_{}x{}.png'.format(w,h) ))
+  
   icon_icns = os.path.abspath(os.path.join('target', 'HTIR.icns'))
-  icon_w = 600
-  icon_h = 600
+  icon_sizes = [
+    (64, 64), (128, 128), (256, 256), (512, 512)
+  ]
 
-  for f in [icon_png, icon_icns]:
+  for f in [icon_icns] + [x for x in icon_pngs(icon_sizes)]:
     if os.path.exists(f):
       os.remove(f)
 
@@ -92,16 +97,21 @@ def gen_icons():
 
 
   # Render it!
-  scene.render(icon_png, width=icon_w, height=icon_h, antialiasing=0.001, output_alpha=True)
+  for w, h in icon_sizes:
+    icon_png = next( icon_pngs([(w, h)]) )
+    scene.render(icon_png, width=w, height=h, antialiasing=0.001, output_alpha=True)
 
   # Write more output!
   img = icnsutil.IcnsFile()
-  img.add_media(key='{}x{}'.format(icon_w, icon_h), file=icon_png)
+  for w, h in icon_sizes:
+    icon_png = next( icon_pngs([(w, h)]) )
+    img.add_media(key='icon_{}x{}'.format(w, h), file=icon_png)
   img.write(icon_icns)
 
   # Just for jeff to inspect stuff
   if '/j/' in os.environ.get('HOME', ''):
-    subprocess.run(['feh', icon_png], check=False)
+    largest_icon = [x for x in icon_pngs([(w, h)])][-1]
+    subprocess.run(['feh', largest_icon ], check=False)
 
   
 
