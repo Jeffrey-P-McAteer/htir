@@ -64,7 +64,15 @@ sproc = subprocess.Popen(server_cmd, cwd=os.path.join('.'))
 
 try:
   if is_macos_host():
-    client_cmd = ['/usr/bin/open', '-W', '-a', HTIR_app, '--args'] + list(sys.argv[1:])
+    client_cmd = [
+      '/usr/bin/open',
+      '-W', # Wait for app to close
+      '--stdin', '/dev/stdin',       # Forward stdin
+      '--stdout', '/dev/stdout',     # Forward stdout
+      '--stderr', '/dev/stderr',     # Forward stderr
+      '-a', HTIR_app, # -a <application>.app
+      '--args'] + list(sys.argv[1:])
+
     print('Running MacOS client app: {}'.format(' '.join(client_cmd)))
     subprocess.run(client_cmd, cwd=os.path.join('.'))
   else:
