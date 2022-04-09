@@ -1,6 +1,8 @@
 
 use crate::config::Args;
 
+use std::io::Write;
+
 use cacao::macos::{App, AppDelegate, menu::Menu, menu::MenuItem};
 use cacao::macos::window::Window;
 
@@ -11,6 +13,9 @@ pub fn open_gui(_args: &Args) -> Result<(), Box<dyn std::error::Error>> {
     Menu::new("HTIR", vec![
       MenuItem::new("Hello World Menu Item").action(|| {
         println!("Hello World Menu Item clicked!");
+        if let Err(error) = std::io::stdout().flush() {
+            println!("std::io::stdout().flush() error={:?}", error);
+        }
       }),
       MenuItem::EnterFullScreen,
       MenuItem::CloseWindow,
@@ -19,12 +24,15 @@ pub fn open_gui(_args: &Args) -> Result<(), Box<dyn std::error::Error>> {
     Menu::new("Edit", vec![
       MenuItem::new("Edit Menu Item").action(|| {
         println!("Edit Menu Item clicked!");
+        if let Err(error) = std::io::stdout().flush() {
+            println!("std::io::stdout().flush() error={:?}", error);
+        }
       }),
     ]),
   ]);
 
   app.run();
-  
+
   Ok(())
 }
 
@@ -55,6 +63,9 @@ impl AppDelegate for BasicApp {
       let m = Menu::new("HTIR", vec![
         MenuItem::new("Hello World Menu Item").action(|| {
           println!("Hello World Menu Item clicked!");
+          if let Err(error) = std::io::stdout().flush() {
+              println!("std::io::stdout().flush() error={:?}", error);
+          }
         }),
         MenuItem::EnterFullScreen,
         MenuItem::CloseWindow,

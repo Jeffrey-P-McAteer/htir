@@ -12,6 +12,7 @@ import traceback
 import platform
 import threading
 import select
+import time
 
 def is_windows_host():
   return os.name == 'nt'
