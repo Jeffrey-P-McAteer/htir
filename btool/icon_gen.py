@@ -32,7 +32,9 @@ def gen_icons():
   
   icon_icns = os.path.abspath(os.path.join('target', 'HTIR.icns'))
   icon_sizes = [
-    (64, 64), (128, 128), (256, 256), (512, 512)
+    # Ensure we use sizes icnsutil supports: https://github.com/relikd/icnsutil/blob/8243534f650c3b00fd59b141debf92fd30800aa5/icnsutil/IcnsType.py#L118
+    #(16, 16), (32, 32), (48, 48),
+    (128, 128), (256, 256), (512, 512), (1024, 1024),
   ]
 
   for f in [icon_icns] + [x for x in icon_pngs(icon_sizes)]:
@@ -106,8 +108,13 @@ def gen_icons():
   for w, h in icon_sizes:
     icon_png = next( icon_pngs([(w, h)]) )
     #img.add_media(key='icon_{}x{}'.format(w, h), file=icon_png)
-    img.add_media(file=icon_png)
+    print('icon_png={}'.format(icon_png))
+    with open(icon_png, 'rb') as fd:
+      data = fd.read()
+      img.add_media(file=os.path.basename(icon_png), data=data)
   img.write(icon_icns, toc=True)
+
+  print('verify output = {}'.format([x for x in icnsutil.IcnsFile.verify(icon_icns)]))
 
   # Just for jeff to inspect stuff
   if '/j/' in os.environ.get('HOME', ''):
