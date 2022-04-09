@@ -1,7 +1,7 @@
 
 use crate::config::Args;
 
-use cacao::macos::{App, AppDelegate, Menu, MenuItem};
+use cacao::macos::{App, AppDelegate, menu::Menu, menu::MenuItem};
 use cacao::macos::window::Window;
 
 pub fn open_gui(_args: &Args) -> Result<(), Box<dyn std::error::Error>> {
