@@ -73,12 +73,12 @@ def poll_fifo_write_to_stdout(fifo_file=None):
   import os
   import sys
   import select
-  
+
   if fifo_file is None:
     fifo_file = sys.argv[1]
   
   child_poll_exit_flag_file = os.path.abspath( os.path.join('target', 'htir_app_io_children_exit_pls.txt') )
-  print('Polling {} unil {} exists'.format(fifo_file, child_poll_exit_flag_file))
+  print('Polling {} until {} exists'.format(fifo_file, child_poll_exit_flag_file))
 
   with open(fifo_file, 'r') as fd:
     while not os.path.exists(child_poll_exit_flag_file):
@@ -119,7 +119,13 @@ try:
       '--args'] + list(sys.argv[1:])
 
     print('Running MacOS client app: {}'.format(' '.join(client_cmd)))
-    subprocess.run(client_cmd, cwd=os.path.join('.'))
+    #subprocess.run(client_cmd, cwd=os.path.join('.'))
+    client_p = subprocess.Popen(client_cmd, cwd=os.path.join('.'))
+
+    while client_p.returncode is None:
+      time.sleep(0.05)
+
+    print('Client app exited with {}'.format(client_p.returncode))
     
     with open(child_poll_exit_flag_file, 'w') as fd:
       fd.write('1')
