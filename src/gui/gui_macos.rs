@@ -7,7 +7,7 @@ use cacao::macos::window::Window;
 pub fn open_gui(_args: &Args) -> Result<(), Box<dyn std::error::Error>> {
   let app = App::new("com.hello.world", BasicApp::default());
   
-  app.set_menu(vec![
+  App::set_menu(vec![
     Menu::new("HTIR", vec![
       MenuItem::new("Hello World Menu Item").action(|| {
         println!("Hello World Menu Item clicked!");
@@ -24,6 +24,7 @@ pub fn open_gui(_args: &Args) -> Result<(), Box<dyn std::error::Error>> {
   ]);
 
   app.run();
+  
   Ok(())
 }
 
