@@ -34,7 +34,7 @@ impl AppDelegate for BasicApp {
       println!("BasicApp.dock_menu()");
 
       let m = Menu::new("HTIR", vec![
-        MenuItem::New("Hello World Menu Item").action(|| {
+        MenuItem::new("Hello World Menu Item").action(|| {
           println!("Hello World Menu Item clicked!");
         }),
         MenuItem::EnterFullScreen,
