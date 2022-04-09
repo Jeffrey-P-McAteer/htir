@@ -14,6 +14,7 @@ import threading
 import select
 import time
 import multiprocessing
+import inspect
 
 def is_windows_host():
   return os.name == 'nt'
@@ -66,10 +67,31 @@ server_cmd = [server_exe]
 print('Spawning background server: {}'.format(' '.join(server_cmd)))
 sproc = subprocess.Popen(server_cmd, cwd=os.path.join('.'))
 
+# This is used on macos systems; we use inspect to pull this source code
+# and concatinate on a call to poll_fifo_write_to_stdout()
+def poll_fifo_write_to_stdout(fifo_file=None):
+  import os
+  import sys
+  if fifo_file is None:
+    fifo_file = sys.argv[1]
+  
+  child_poll_exit_flag_file = os.path.abspath( os.path.join('target', 'htir_app_io_children_exit_pls.txt') )
+  print('Polling {} unil {} exists'.format(fifo_file, child_poll_exit_flag_file))
+
+  with open(fifo_file, 'r') as fd:
+    while not os.path.exists(child_poll_exit_flag_file):
+      select.select([fd],[],[fd]) # Wait until I/O available
+      data = fd.read()
+      if len(data) > 0:
+        sys.stdout.write(data)
+        sys.stdout.flush()
+
+
 try:
   if is_macos_host():
     stdout_fifo = os.path.abspath( os.path.join('target', 'htir_app_stdout.fifo') )
     stderr_fifo = os.path.abspath( os.path.join('target', 'htir_app_stderr.fifo') )
+
     if not os.path.exists(stdout_fifo):
       os.mkfifo(stdout_fifo)
     if not os.path.exists(stderr_fifo):
@@ -80,20 +102,10 @@ try:
       os.remove(child_poll_exit_flag_file)
 
     # Spawn a process to poll each FIFO object
-    def poll_fifo_write_to_stdout(fifo_file):
-      with open(fifo_file, 'r') as fd:
-        while not os.path.exists(child_poll_exit_flag_file):
-          select.select([fd],[],[fd]) # Wait until I/O available
-          data = fd.read()
-          if len(data) > 0:
-            sys.stdout.write(data)
-            sys.stdout.flush()
-
-
-    t1 = multiprocessing.Process(target=poll_fifo_write_to_stdout, args=(stdout_fifo,))
-    t1.start()
-    t2 = multiprocessing.Process(target=poll_fifo_write_to_stdout, args=(stderr_fifo,))
-    t2.start()
+    poll_procs = []
+    subprocess_src = inspect.getsource(poll_fifo_write_to_stdout) + os.linesep + 'poll_fifo_write_to_stdout()' + os.linesep
+    poll_procs.append( subprocess.Popen([sys.executable, '-c', subprocess_src, stdout_fifo]) )
+    poll_procs.append( subprocess.Popen([sys.executable, '-c', subprocess_src, stderr_fifo]) )
 
     client_cmd = [
       '/usr/bin/open',
@@ -109,6 +121,12 @@ try:
     
     with open(child_poll_exit_flag_file, 'w') as fd:
       fd.write('1')
+
+    for p in poll_procs:
+      try:
+        p.kill()
+      except:
+        traceback.print_exc()
 
   else:
     client_cmd = [client_exe] + list(sys.argv[1:])
