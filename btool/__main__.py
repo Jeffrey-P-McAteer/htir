@@ -16,6 +16,8 @@ import time
 import multiprocessing
 import inspect
 
+from . import icon_gen
+
 def is_windows_host():
   return os.name == 'nt'
 
@@ -27,6 +29,11 @@ def is_macos_host():
 for _ in range(0, 12):
   if not (os.path.exists('.gitignore') and os.path.exists('readme.md')):
     os.chdir('..')
+if not os.path.exists('target'):
+  os.makedirs('target')
+
+# Uses a 3rd-party renderer & python code to render high-quality .png and generate a .icns file under ./target/
+icon_gen.gen_icons()
 
 subprocess.run(['cargo', 'build', '--release'], check=True)
 
