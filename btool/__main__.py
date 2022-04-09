@@ -67,55 +67,20 @@ server_cmd = [server_exe]
 print('Spawning background server: {}'.format(' '.join(server_cmd)))
 sproc = subprocess.Popen(server_cmd, cwd=os.path.join('.'))
 
-# This is used on macos systems; we use inspect to pull this source code
-# and concatinate on a call to poll_fifo_write_to_stdout()
-def poll_fifo_write_to_stdout(fifo_file=None):
-  import os
-  import sys
-  import select
-  import time
-  
-  if fifo_file is None:
-    fifo_file = sys.argv[1]
-  
-  child_poll_exit_flag_file = os.path.abspath( os.path.join('target', 'htir_app_io_children_exit_pls.txt') )
-  print('Polling {} until {} exists'.format(fifo_file, child_poll_exit_flag_file))
-
-  with open(fifo_file, 'r') as fd:
-    while not os.path.exists(child_poll_exit_flag_file):
-      #select.select([fd],[],[fd]) # Wait until I/O available
-      time.sleep(0.05)
-      data = fd.read()
-      if len(data) > 0:
-        sys.stdout.write(data)
-        sys.stdout.flush()
-
-
 try:
   if is_macos_host():
-    stdout_fifo = os.path.abspath( os.path.join('target', 'htir_app_stdout.fifo') )
-    stderr_fifo = os.path.abspath( os.path.join('target', 'htir_app_stderr.fifo') )
+    stdout_file = os.path.abspath( os.path.join('target', 'htir_app_stdout.txt') )
+    stderr_file = os.path.abspath( os.path.join('target', 'htir_app_stderr.txt') )
 
-    if not os.path.exists(stdout_fifo):
-      os.mkfifo(stdout_fifo)
-    if not os.path.exists(stderr_fifo):
-      os.mkfifo(stderr_fifo)
-
-    child_poll_exit_flag_file = os.path.abspath( os.path.join('target', 'htir_app_io_children_exit_pls.txt') )
-    if os.path.exists(child_poll_exit_flag_file):
-      os.remove(child_poll_exit_flag_file)
-
-    # Spawn a process to poll each FIFO object
-    poll_procs = []
-    subprocess_src = inspect.getsource(poll_fifo_write_to_stdout) + os.linesep + 'poll_fifo_write_to_stdout()' + os.linesep
-    poll_procs.append( subprocess.Popen([sys.executable, '-c', subprocess_src, stdout_fifo]) )
-    poll_procs.append( subprocess.Popen([sys.executable, '-c', subprocess_src, stderr_fifo]) )
+    for f in [stdout_file, stderr_file]:
+      with open(f, 'w') as fd:
+        fd.write('') # empty & create the file in the same call
 
     client_cmd = [
       '/usr/bin/open',
       '-W', # Wait for app to close
-      '--stdout', stdout_fifo,     # Forward stdout (causes permission errors if /dev/stdout)
-      '--stderr', stderr_fifo,     # Forward stderr (causes permission errors if /dev/stderr)
+      '--stdout', stdout_file,     # Forward stdout (causes permission errors if /dev/stdout)
+      '--stderr', stderr_file,     # Forward stderr (causes permission errors if /dev/stderr)
       '-a', HTIR_app, # -a <application>.app
       '--args'] + list(sys.argv[1:])
 
@@ -123,21 +88,23 @@ try:
     #subprocess.run(client_cmd, cwd=os.path.join('.'))
     client_p = subprocess.Popen(client_cmd, cwd=os.path.join('.'))
 
+    printed_stdout = ''
+    printed_stderr = ''
     while client_p.poll() is None:
-      sys.stdout.flush()
+      for f in [stdout_file, stderr_file]:
+        with open(f, 'r') as fd:
+          contents = fd.read()
+          if len(contents) > 0:
+            new_contents = contents[len(printed_stdout):]
+            if len(new_contents) > 0:
+              sys.stdout.write(new_contents)
+              sys.stdout.flush()
+              printed_stdout += new_contents
+
       time.sleep(0.05)
 
     print('Client app exited with {}'.format(client_p.returncode))
     
-    with open(child_poll_exit_flag_file, 'w') as fd:
-      fd.write('1')
-
-    for p in poll_procs:
-      try:
-        p.kill()
-      except:
-        traceback.print_exc()
-
   else:
     client_cmd = [client_exe] + list(sys.argv[1:])
     print('Running client command: {}'.format(' '.join(client_cmd)))
