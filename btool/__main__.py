@@ -17,6 +17,7 @@ import multiprocessing
 import inspect
 
 from . import icon_gen
+from . import utils
 
 def is_windows_host():
   return os.name == 'nt'
@@ -74,6 +75,20 @@ if is_macos_host():
       shutil.copy(src_f, dst_f)
     except shutil.SameFileError:
       pass # why bother? Ugh.
+
+  # Finally create Contents/Info.plist
+  plistlib = utils.import_maybe_installing_with_pip('plistlib')
+
+  plist_data = dict(
+    CFBundleExecutable=os.path.join('HTIR'),
+    CFBundleIconFile=os.path.join('Contents', 'Resources', 'AppIcon.icns'),
+    CFBundleIdentifier='pw.jmcateer.htir-client',
+  )
+
+  with open(os.path.join(HTIR_app, 'Contents', 'Info.plist'), 'wb') as fd:
+    plistlib.dump(plist_data, fd)
+
+
   print('MacOS .app created at {}'.format(HTIR_app))
 
 print('')

@@ -6,23 +6,8 @@ import subprocess
 import shutil
 import time
 
-# Utility method to wrap imports with a call to pip to install first.
-# > "100% idiot-proof!" -- guy on street selling rusty dependency chains.
-def import_maybe_installing_with_pip(import_name, pkg_name=None):
-  if pkg_name is None:
-    pkg_name = import_name # 90% of all python packages share their name with their module
-  pkg_spec = importlib.util.find_spec(import_name)
-  install_cmd = []
-  if pkg_spec is None:
-    # package missing, install via pip to user prefix!
-    print('Attempting to install module {} (package {}) with pip...'.format(import_name, pkg_name))
-    install_cmd = [sys.executable, '-m', 'pip', 'install', '--user', pkg_name]
-    subprocess.run(install_cmd, check=False)
-  pkg_spec = importlib.util.find_spec(import_name)
-  if pkg_spec is None:
-    raise Exception('Cannot find module {}, attempted to install {} via pip: {}'.format(import_name, pkg_name, ' '.join(install_cmd) ))
-  
-  return importlib.import_module(import_name)
+from . import utils
+
 
 def gen_icons():
   
@@ -41,14 +26,14 @@ def gen_icons():
     if os.path.exists(f):
       os.remove(f)
 
-  icnsutil = import_maybe_installing_with_pip('icnsutil')
+  icnsutil = utils.import_maybe_installing_with_pip('icnsutil')
   if not shutil.which('povray'):
     print('')
     print('WARNING: you do not have the command "povray" installed, which vapory depends on!')
     print('WARNING: please install "povray" for your OS and add it to your PATH before continuing.')
     print('')
     time.sleep(1)
-  vapory = import_maybe_installing_with_pip('vapory') # POV-ray powered graphics engine!
+  vapory = utils.import_maybe_installing_with_pip('vapory') # POV-ray powered graphics engine!
   
   # Cheap "import"; for all keys in vapory.__dict__ not beginning with '_', add it to locals()
   for key, value in vapory.__dict__.items():
