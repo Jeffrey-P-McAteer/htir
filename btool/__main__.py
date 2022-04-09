@@ -72,6 +72,8 @@ sproc = subprocess.Popen(server_cmd, cwd=os.path.join('.'))
 def poll_fifo_write_to_stdout(fifo_file=None):
   import os
   import sys
+  import select
+  
   if fifo_file is None:
     fifo_file = sys.argv[1]
   
