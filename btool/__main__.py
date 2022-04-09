@@ -103,12 +103,14 @@ try:
 
       time.sleep(0.05)
 
-    print('Client app exited with {}'.format(client_p.returncode))
+    print('HTIR.app exited with {}'.format(client_p.returncode))
     
   else:
+    
     client_cmd = [client_exe] + list(sys.argv[1:])
     print('Running client command: {}'.format(' '.join(client_cmd)))
     subprocess.run(client_cmd, cwd=os.path.join('.'))
+
 except:
   traceback.print_exc()
 
