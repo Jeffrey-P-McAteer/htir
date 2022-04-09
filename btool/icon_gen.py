@@ -28,7 +28,7 @@ def gen_icons():
   
   def icon_pngs(sizes):
     for w,h in sizes:
-      yield os.path.abspath(os.path.join('target', 'HTIR_{}x{}.png'.format(w,h) ))
+      yield os.path.abspath(os.path.join('target', '{}x{}.png'.format(w,h) ))
   
   icon_icns = os.path.abspath(os.path.join('target', 'HTIR.icns'))
   icon_sizes = [
