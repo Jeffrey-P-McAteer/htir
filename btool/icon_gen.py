@@ -5,6 +5,7 @@ import sys
 import subprocess
 import shutil
 import time
+import traceback
 
 from . import utils
 
@@ -28,75 +29,102 @@ def gen_icons():
 
   icnsutil = utils.import_maybe_installing_with_pip('icnsutil')
   if not shutil.which('povray'):
-    print('')
-    print('WARNING: you do not have the command "povray" installed, which vapory depends on!')
-    print('WARNING: please install "povray" for your OS and add it to your PATH before continuing.')
-    print('')
-    time.sleep(1)
-  vapory = utils.import_maybe_installing_with_pip('vapory') # POV-ray powered graphics engine!
+    raise Exception('''
+WARNING: you do not have the command "povray" installed, we depend on for rendering icons!
+WARNING: please install "povray" for your OS and add it to your PATH before continuing.
+'''.strip())
   
-  # Cheap "import"; for all keys in vapory.__dict__ not beginning with '_', add it to locals()
-  for key, value in vapory.__dict__.items():
-    if key.startswith('_'):
-      continue
-    globals()[key] = value
+  pov_scene_file = os.path.abspath( os.path.join('target', 'HTIR_icon.pov') )
+  scene_src = '''
+background {
+  color
+  <0.75,0.75,0.85> 
+}
+light_source {
+  <0,0,0>
+  color
+  <0.9,0.9,0.9>
+  translate
+  <0,5,5.0> 
+}
+light_source {
+  <0,0,0>
+  color
+  <0.15,0.15,0.25>
+  translate
+  <1,6,4.0> 
+}
+cylinder {
+  <0.0,-0.6,0.0>
+  <0.0,0.6,0.0>
+  0.6
+  texture {
+    pigment {
+    color
+    <0.1,0.1,0.9> 
+    }
+    finish {
+    specular
+    0.6 
+    }
+    normal {
+    marble
+    0.25
+    scale
+    0.5 
+    } 
+  }
+  rotate
+  <0,0,0> 
+}
+camera {
+  location
+  <0.0,1.4,4.0>
+  direction
+  <0,0,1.5>
+  look_at
+  <0,0.3,0>
+  blur_samples
+  50
+  right
+  <1.0,0,0>
+  right
+  <1.0,0,0> 
+}
+global_settings{
+  
+}
+  '''
+  with open(pov_scene_file, 'w+') as fd:
+    fd.write(scene_src)
 
-  # Got our dependencies, now describe the icon scene!
-
-  # Coordinate system: [left-right (x), up-down (y), near-far (z)]
-  # color system: [r:0.0->1.0, g:0.0->1.0, b:0.0->1.0]
-  scene = Scene(  Camera('location',  [0.0, 1.4, 4.0],
-                         'direction', [0,0,1.5],
-                         'look_at',  [0, 0.3, 0],
-                         #'aperture', 0.4,
-                         'blur_samples', 100), # increase for high quality render
-
-                  objects = [
-
-                      Background("color", [0.75, 0.75, 0.85]),
-
-                      LightSource([0, 0, 0],
-                                    'color',[0.9, 0.9, 0.9],
-                                    'translate', [0, 5, 5.0]),
-
-                      LightSource ([0, 0, 0],
-                                      'color', [0.15, 0.15, 0.25],
-                                      'translate', [1, 6, 4.0]),
-
-
-                      #Box([-0.5, -0.5, -0.5], [0.5, 0.5, 0.5],
-                      #     Texture( Pigment( 'color', [0.1,0.1,0.9]),
-                      #              Finish('specular', 0.6),
-                      #              Normal('agate', 0.25, 'scale', 0.5)),
-                      #    'rotate', [45, 46, 47]),
-
-                      Cylinder([0.0, -0.6, 0.0], [0.0, 0.6, 0.0], 0.6,
-                          Texture( Pigment( 'color', [0.1,0.1,0.9]),
-                                   Finish('specular', 0.6),
-                                   Normal('marble', 0.25, 'scale', 0.5)
-                                   ),
-                         'rotate', [0, 0, 0]),
-
-                      #Cylinder([-0.5, -0.5, -0.5], [0.5, 0.5, 0.5], 0.5,
-                      #  Finish('ambient', 0.1, 'diffuse', 0.6),
-                      #  Pigment('color', [0.1,0.1,0.9]),
-                      #  'rotate', [45, 46, 47] ),
-
-                 ]
-  )
-
-#  scene_src = '''
-#
-#  '''
-#  with open('/tmp/a.pov') as fd:
-#    fd.write(scene_src)
-
+  print('Rendering {}'.format(pov_scene_file))
 
   # Render it!
   for w, h in icon_sizes:
     icon_png = next( icon_pngs([(w, h)]) )
-    scene.render(icon_png, width=w, height=h, antialiasing=0.001, output_alpha=True)
-
+    # https://www.mankier.com/1/povray
+    cmd = [
+      shutil.which('povray'),
+      pov_scene_file,
+      '+H{}'.format(h),
+      '+W{}'.format(w),
+      '+Q{}'.format(9), # 0=rough, 9=full ray tracing, 10 and 11 add radiosity
+      '+A{}'.format(0.001), # antialiasing
+      'Output_Alpha=on',
+      '-D', # do not display image after render
+      'Output_File_Type={}'.format('N'), # ???
+      'Verbose=false',
+      '+O{}'.format(icon_png),
+    ]
+    print('> {}'.format(' '.join(cmd)))
+    # Only print output on errors, direct stderr to stdout for subprocess
+    try:
+      out = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as error:
+      traceback.print_exc()
+      print('\nError running povray, exit code {}\n\n{}\n'.format(error.returncode, error.output))
+      
   # Write more output!
   img = icnsutil.IcnsFile()
   for w, h in icon_sizes:
@@ -108,7 +136,7 @@ def gen_icons():
       img.add_media(file=os.path.basename(icon_png), data=data)
   img.write(icon_icns, toc=True)
 
-  print('verify output = {}'.format([x for x in icnsutil.IcnsFile.verify(icon_icns)]))
+  print('.icns verify output = {}'.format([x for x in icnsutil.IcnsFile.verify(icon_icns)]))
 
   # Just for jeff to inspect stuff
   if '/j/' in os.environ.get('HOME', ''):
