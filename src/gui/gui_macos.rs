@@ -39,10 +39,19 @@ pub fn open_gui(_args: &Args) -> Result<(), Box<dyn std::error::Error>> {
 
 
 
-#[derive(Default)]
+#[derive(Debug)]
 struct BasicApp {
     pub window: Window,
     pub toolbar: Toolbar<BasicToolbar>,
+}
+
+impl Default for BasicApp {
+  fn default() -> Self {
+      BasicApp{
+        window: Window::default(),
+        toolbar: Toolbar::new("HTIR-Toolbar", BasicToolbar::default()),
+      }
+    }
 }
 
 impl AppDelegate for BasicApp {
