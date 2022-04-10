@@ -16,6 +16,10 @@ pub fn conditional_hide_console_if_double_clicked_on_windows() {
             // We were launched from explorer.exe, detatch the console
             unsafe { winapi::um::wincon::FreeConsole() };
         }
+        else {
+            // We were launched from cmd.exe (or equivelant), attach to parent console!
+            unsafe { winapi::um::wincon::AttachConsole( winapi::um::wincon::ATTACH_PARENT_PROCESS ) };
+        }
         // Otherwise do nothing, we want console messages when run from the console.
     }
 }

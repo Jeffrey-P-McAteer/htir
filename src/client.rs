@@ -1,4 +1,8 @@
 
+// I _HATE_ this
+#[cfg(target_os = "windows")]
+#![windows_subsystem = "windows"]
+
 use tokio::runtime::{Builder};
 use clap::Parser;
 
