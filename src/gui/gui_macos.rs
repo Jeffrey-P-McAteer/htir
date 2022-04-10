@@ -54,8 +54,7 @@ impl Default for BasicApp {
       BasicApp {
         window: Window::with({
           let mut config = WindowConfig::default();
-          // This flag is necessary for Big Sur to use the correct toolbar style.
-          config.toolbar_style = WindowToolbarStyle::Expanded;
+          config.toolbar_style = WindowToolbarStyle::Unified; // Big toolbars \o/
           config
         }, BasicWindow::default() ),
       }
