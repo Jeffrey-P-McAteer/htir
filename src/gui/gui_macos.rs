@@ -5,7 +5,7 @@ use std::io::Write;
 
 use cacao::macos::{
   App, AppDelegate,
-  window::Window, window::WindowConfig, window::WindowToolbarStyle,
+  window::Window, window::WindowDelegate, window::WindowConfig, window::WindowToolbarStyle,
   menu::Menu, menu::MenuItem,
   toolbar::Toolbar, toolbar::ToolbarDelegate, toolbar::ToolbarDisplayMode, toolbar::ToolbarItem, toolbar::ItemIdentifier
 };
