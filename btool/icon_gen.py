@@ -83,7 +83,12 @@ WARNING: please install "povray" for your OS and add it to your PATH before cont
 if __name__ == '__main__':
   # Allow testing va a render of 256x256 size via
   # python -m btool.icon_gen
-  gen_icons('htir_app_icon.pov', icon_sizes=[(512, 512)], display_cmd=['feh'])
+  display_cmd = None
+  if shutil.which('feh'):
+    display_cmd = ['feh']
+  elif shutil.which('open'):
+    display_cmd = ['open']
+  gen_icons('htir_app_icon.pov', icon_sizes=[(512, 512)], display_cmd=display_cmd)
 
 
 

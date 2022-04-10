@@ -29,12 +29,12 @@ cylinder {
       specular
       0.6 
     }
-    normal {
+    /*normal {
       marble
       0.25
       scale
       0.5 
-    } 
+    }*/
   }
   rotate
   <0,0,0> 
