@@ -46,7 +46,7 @@ struct BasicApp {
 impl AppDelegate for BasicApp {
     fn did_finish_launching(&self) {
         println!("BasicApp.did_finish_launching()");
-        self.window.set_minimum_content_size(400., 400.);
+        self.window.set_minimum_content_size(400.0, 300.0);
         self.window.set_title("Hello World!");
         self.window.show();
     }

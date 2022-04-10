@@ -38,5 +38,5 @@ cacao = { version = "0.2" }
 
 [target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies]
 gtk4 = { version = "0.4" }
-
+glib = { version = "0.15" }
 

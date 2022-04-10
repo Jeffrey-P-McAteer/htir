@@ -41,7 +41,7 @@ subprocess.run(['cargo', 'build', '--release'], check=True)
 if not is_macos_host():
   try:
     subprocess.run(['cargo', 'build', '--release'], check=True, cwd='htir_py')
-    library_renames = [('libhtir.so', 'htir.so')]
+    library_renames = [('libhtir.so', 'htir.so'), ]
     for name, target_name in library_renames:
       full_path = os.path.join('htir_py', 'target', 'release', name)
       if os.path.exists(full_path):
@@ -62,7 +62,7 @@ HTIR_app = None
 if is_macos_host():
   # use client_exe to create target/HTIR.app, a directory
   # conforming to apple's app setup.
-  HTIR_app = os.path.abspath( os.path.join('target', 'release', 'HTIR.app') )
+  HTIR_app = os.path.abspath( os.path.join('target', 'HTIR.app') )
   os.makedirs(HTIR_app, exist_ok=True)
   os.makedirs(os.path.join(HTIR_app, 'Contents', 'Resources'), exist_ok=True)
   
