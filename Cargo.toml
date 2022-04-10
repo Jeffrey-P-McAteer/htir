@@ -30,7 +30,7 @@ clap = { version = "3.1", features = ["derive"] }
 
 [target.'cfg(target_os = "windows")'.dependencies]
 winapi = { version = "0.3", features = ["wincon", "winuser"]}
-winsafe = { version = "0.0.9", features = ["comctl", "comdlg", "gui", "kernel", "msimg", "shell", "shlwapi", "user", "uxtheme"] }
+winsafe = { version = "0.0.9", features = ["gui", "kernel", "shell", "user"] }
 
 [target.'cfg(windows)'.build-dependencies]
 winres = "0.1"
