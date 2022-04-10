@@ -1,5 +1,6 @@
 
 use crate::config::Args;
+use crate::util;
 
 use winsafe::prelude::*;
 use winsafe::{gui, POINT, SIZE, WinResult};
@@ -10,8 +11,9 @@ pub fn open_gui(args: &Args) -> Result<(), Box<dyn std::error::Error>> {
     util::conditional_hide_console_if_double_clicked_on_windows();
   }
   let my = MyWindow::new();
-  let ret_code = my.wnd.run_main(None)?;
-  println!("wnd.ret_code={}", ret_code);
+  if let Err(e) = my.wnd.run_main(None) {
+    println!("wnd error = {:?}", e);
+  }
   Ok(())
 }
 
