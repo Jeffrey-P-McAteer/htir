@@ -14,6 +14,7 @@ pub fn open_gui(_args: &Args) -> Result<(), Box<dyn std::error::Error>> {
       let window = ApplicationWindow::builder()
           .application(app)
           .title("HTIR Client")
+          .decorated(true) // TODO use user preference?
           .default_width(400)
           .default_height(300)
           .build();
