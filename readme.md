@@ -92,9 +92,10 @@ Benefits which _could_ be designed in but are explicitly _not_:
 Windows (using the (Chocolatey)[https://chocolatey.org/] package manager):
 
 ```bash
-choco install -y imagemagick rust python3 cygwin
-# Install cygwin & from cygwin install povray so you get "povray.exe" instead of pvengine.exe
-# You will also need to add directories to your PATH under Start > Edit Your Account Environment Variables > PATH
+choco install -y imagemagick pov-ray rust python3 mingw
+# For any missing binaries you will also need to add
+# the directories where they were installed to
+# to your PATH under Start > Edit Your Account Environment Variables > PATH
 ```
 
 MacOS (using the (Homebrew)[https://brew.sh/] package manager):
