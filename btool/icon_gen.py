@@ -102,8 +102,20 @@ def gen_icons(pov_scene_file, icon_sizes=None, display_cmd=None):
       icon_png = next( icon_pngs([(w, h)]) )
       with open(icon_png, 'rb') as fd:
         data = fd.read()
-        img.add_media(file=os.path.basename(icon_png), data=data)
+        try:
+          img.add_media(file=os.path.basename(icon_png), data=data)
+        except:
+          # We get an error after 512x512@2x is added and then 1024x1024 is added, but this appears ignoreable?
+          # KeyError: 'Image with identical key "ic10". File: 1024x1024.png'
+          traceback.print_exc()
+        
 
+      possible_2x = next( icon_pngs([(w*2, h*2)]) )
+      if os.path.exists(possible_2x):
+        with open(possible_2x, 'rb') as fd:
+          data_2x = fd.read() # read the 2x data
+          img.add_media(file=os.path.basename( next(icon_pngs([(w, h)], suffix='@2x') ) ), data=data_2x)
+          
     img.write(icon_icns, toc=True)
 
   print('.icns verify output = {}'.format([x for x in icnsutil.IcnsFile.verify(icon_icns)]))
