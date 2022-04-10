@@ -95,7 +95,7 @@ def gen_icons(pov_scene_file, icon_sizes=None, display_cmd=None):
       subprocess.run(cmd, check=True)
 
       
-  # Write more output!
+  # Write macos-specific output!
   if any([is_source_newer(x, icon_icns) for x in icon_pngs(icon_sizes)]):
     img = icnsutil.IcnsFile()
     for w, h in icon_sizes:
@@ -107,6 +107,19 @@ def gen_icons(pov_scene_file, icon_sizes=None, display_cmd=None):
     img.write(icon_icns, toc=True)
 
   print('.icns verify output = {}'.format([x for x in icnsutil.IcnsFile.verify(icon_icns)]))
+
+  # Write windows-specific output! (use first OR closest to 256 size)
+  best_icon_size = icon_sizes[0]
+  for h,w in icon_sizes:
+    if h > 200 and h < 300 and w > 200 and w < 300:
+      best_icon_size = (h, w)
+  icon_png = next( icon_pngs([best_icon_size]) )
+  windows_ico_file = os.path.abspath(os.path.join('target', 'HTIR.ico'))
+  if is_source_newer(icon_png, windows_ico_file):
+    print('Generating {}'.format(windows_ico_file))
+    img = PIL.Image.open(icon_png)
+    img.save(windows_ico_file, sizes=[(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (255, 255)])
+
 
   if display_cmd is not None:
     largest_icon = [x for x in icon_pngs([(w, h)])][-1]

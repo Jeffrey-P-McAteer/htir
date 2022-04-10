@@ -87,6 +87,29 @@ Benefits which _could_ be designed in but are explicitly _not_:
 
 `// TODO`
 
+# Dependency One-Liners
+
+Windows (using the (Chocolatey)[https://chocolatey.org/] package manager):
+
+```
+choco install -y pov-ray imagemagick rust python3
+```
+
+MacOS (using the (Homebrew)[https://brew.sh/] package manager):
+
+```
+brew install povray imagemagick rust python3
+```
+
+Arch Linux:
+
+```
+yay -Syu povray imagemagick rust python
+```
+
+TODO document quick setups for the crummier OSes and Gentoo.
+
+
 # Build Steps
 
 `// TODO`
