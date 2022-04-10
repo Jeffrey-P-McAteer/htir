@@ -60,18 +60,18 @@ cylinder {
   0.6
   texture {
     pigment {
-    color
-    <0.1,0.1,0.9> 
+      color
+      <0.1,0.1,0.9> 
     }
     finish {
-    specular
-    0.6 
+      specular
+      0.6 
     }
     normal {
-    marble
-    0.25
-    scale
-    0.5 
+      marble
+      0.25
+      scale
+      0.5 
     } 
   }
   rotate
