@@ -55,7 +55,7 @@ impl Default for BasicApp {
         window: Window::with({
           let mut config = WindowConfig::default();
           config.set_styles(&[WindowStyle::UnifiedTitleAndToolbar]); // Big toolbars \o/
-          config.toolbar_style = WindowToolbarStyle::Unified; // Big toolbars \o/
+          //config.toolbar_style = WindowToolbarStyle::Unified; // Big toolbars \o/
           config
         }, BasicWindow::default() ),
       }
