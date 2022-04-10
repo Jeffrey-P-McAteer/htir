@@ -1,4 +1,3 @@
-use std::io;
 
 #[cfg(windows)]
 use winres::WindowsResource;
