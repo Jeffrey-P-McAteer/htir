@@ -5,7 +5,7 @@ use std::io::Write;
 
 use cacao::macos::{
   App, AppDelegate,
-  window::Window,
+  window::Window, window::WindowConfig, window::WindowToolbarStyle,
   menu::Menu, menu::MenuItem,
   toolbar::Toolbar, toolbar::ToolbarDelegate, toolbar::ToolbarDisplayMode, toolbar::ToolbarItem, toolbar::ItemIdentifier
 };
@@ -41,27 +41,50 @@ pub fn open_gui(_args: &Args) -> Result<(), Box<dyn std::error::Error>> {
 
 #[derive(Debug)]
 struct BasicApp {
-    pub window: Window,
-    pub toolbar: Toolbar<BasicToolbar>,
+    pub window: Window<BasicWindow>,
+}
+
+#[derive(Debug)]
+struct BasicWindow {
+  pub toolbar: Toolbar<BasicToolbar>,
 }
 
 impl Default for BasicApp {
   fn default() -> Self {
-      BasicApp{
-        window: Window::default(),
-        toolbar: Toolbar::new("HTIR-Toolbar", BasicToolbar::default()),
+      BasicApp {
+        window: Window::with({
+          let mut config = WindowConfig::default();
+          // This flag is necessary for Big Sur to use the correct toolbar style.
+          config.toolbar_style = WindowToolbarStyle::Expanded;
+          config
+        }, BasicWindow::default() ),
       }
+    }
+}
+
+impl Default for BasicWindow {
+  fn default() -> Self {
+    BasicWindow {
+      toolbar: Toolbar::new("HTIR-Toolbar", BasicToolbar::default()),
+    }
+  }
+}
+
+impl WindowDelegate for BasicWindow {
+    const NAME: &'static str = "HTIR-Client-WindowDelegate";
+
+    fn did_load(&mut self, window: Window) {
+        window.set_minimum_content_size(400.0, 300.0);
+        window.set_title("HTIR Client");
+        window.set_movable_by_background(true);
+        window.set_titlebar_appears_transparent(false);
+        window.set_toolbar(&self.toolbar);
+
     }
 }
 
 impl AppDelegate for BasicApp {
     fn did_finish_launching(&self) {
-        self.window.set_minimum_content_size(400.0, 300.0);
-        self.window.set_title("HTIR Client");
-        self.window.set_movable_by_background(true);
-        self.window.set_titlebar_appears_transparent(false);
-        self.window.set_toolbar(&self.toolbar);
-
         self.window.show();
     }
     fn will_terminate(&self) {
