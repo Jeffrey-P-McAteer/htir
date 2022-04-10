@@ -43,23 +43,25 @@ def gen_icons():
 
   # Got our dependencies, now describe the icon scene!
 
-  scene = Scene(  Camera('location',  [0.0, 0.5, -4.0],
+  # Coordinate system: [left-right (x), up-down (y), near-far (z)]
+  # color system: [r:0.0->1.0, g:0.0->1.0, b:0.0->1.0]
+  scene = Scene(  Camera('location',  [0.0, 1.4, 4.0],
                          'direction', [0,0,1.5],
-                         'look_at',  [0, 0, 0],
+                         'look_at',  [0, 0.3, 0],
                          #'aperture', 0.4,
                          'blur_samples', 100), # increase for high quality render
 
                   objects = [
 
-                      Background("color", [0.85, 0.75, 0.75]),
+                      Background("color", [0.75, 0.75, 0.85]),
 
                       LightSource([0, 0, 0],
                                     'color',[0.9, 0.9, 0.9],
-                                    'translate', [-5, 5, -5]),
+                                    'translate', [0, 5, 5.0]),
 
                       LightSource ([0, 0, 0],
                                       'color', [0.15, 0.15, 0.25],
-                                      'translate', [6, -6, -6]),
+                                      'translate', [1, 6, 4.0]),
 
 
                       #Box([-0.5, -0.5, -0.5], [0.5, 0.5, 0.5],
@@ -68,11 +70,12 @@ def gen_icons():
                       #              Normal('agate', 0.25, 'scale', 0.5)),
                       #    'rotate', [45, 46, 47]),
 
-                      Cylinder([-0.5, -0.5, -0.5], [0.5, 0.5, 0.5], 0.4,
+                      Cylinder([0.0, -0.6, 0.0], [0.0, 0.6, 0.0], 0.6,
                           Texture( Pigment( 'color', [0.1,0.1,0.9]),
                                    Finish('specular', 0.6),
-                                   Normal('agate', 0.25, 'scale', 0.5)),
-                         'rotate', [-45, -45, 45]),
+                                   Normal('marble', 0.25, 'scale', 0.5)
+                                   ),
+                         'rotate', [0, 0, 0]),
 
                       #Cylinder([-0.5, -0.5, -0.5], [0.5, 0.5, 0.5], 0.5,
                       #  Finish('ambient', 0.1, 'diffuse', 0.6),
@@ -81,6 +84,12 @@ def gen_icons():
 
                  ]
   )
+
+#  scene_src = '''
+#
+#  '''
+#  with open('/tmp/a.pov') as fd:
+#    fd.write(scene_src)
 
 
   # Render it!
