@@ -57,7 +57,7 @@ impl AppDelegate for BasicApp {
       println!("BasicApp.should_terminate_after_last_window_closed()");
       return true;
     }
-    fn dock_menu(&self) -> Option<Menu> {
+    /*fn dock_menu(&self) -> Option<Menu> {
       println!("BasicApp.dock_menu()");
 
       let m = Menu::new("HTIR", vec![
@@ -73,6 +73,6 @@ impl AppDelegate for BasicApp {
       ]);
 
       return Some(m);
-    }
+    }*/
 }
 
