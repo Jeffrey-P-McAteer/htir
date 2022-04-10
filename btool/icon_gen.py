@@ -10,18 +10,19 @@ import traceback
 from . import utils
 
 
-def gen_icons():
+def gen_icons(pov_scene_file, icon_sizes=None, display_cmd=None):
   
   def icon_pngs(sizes):
     for w,h in sizes:
       yield os.path.abspath(os.path.join('target', '{}x{}.png'.format(w,h) ))
   
   icon_icns = os.path.abspath(os.path.join('target', 'HTIR.icns'))
-  icon_sizes = [
-    # Ensure we use sizes icnsutil supports: https://github.com/relikd/icnsutil/blob/8243534f650c3b00fd59b141debf92fd30800aa5/icnsutil/IcnsType.py#L118
-    #(16, 16), (32, 32), (48, 48),
-    (128, 128), (256, 256), (512, 512), (1024, 1024),
-  ]
+  if icon_sizes is None:
+    icon_sizes = [
+      # Ensure we use sizes icnsutil supports: https://github.com/relikd/icnsutil/blob/8243534f650c3b00fd59b141debf92fd30800aa5/icnsutil/IcnsType.py#L118
+      #(16, 16), (32, 32), (48, 48),
+      (128, 128), (256, 256), (512, 512), (1024, 1024),
+    ]
 
   for f in [icon_icns] + [x for x in icon_pngs(icon_sizes)]:
     if os.path.exists(f):
@@ -34,70 +35,6 @@ WARNING: you do not have the command "povray" installed, we depend on for render
 WARNING: please install "povray" for your OS and add it to your PATH before continuing.
 '''.strip())
   
-  pov_scene_file = os.path.abspath( os.path.join('target', 'HTIR_icon.pov') )
-  scene_src = '''
-background {
-  color
-  <0.75,0.75,0.85> 
-}
-light_source {
-  <0,0,0>
-  color
-  <0.9,0.9,0.9>
-  translate
-  <0,5,5.0> 
-}
-light_source {
-  <0,0,0>
-  color
-  <0.15,0.15,0.25>
-  translate
-  <1,6,4.0> 
-}
-cylinder {
-  <0.0,-0.6,0.0>
-  <0.0,0.6,0.0>
-  0.6
-  texture {
-    pigment {
-      color
-      <0.1,0.1,0.9> 
-    }
-    finish {
-      specular
-      0.6 
-    }
-    normal {
-      marble
-      0.25
-      scale
-      0.5 
-    } 
-  }
-  rotate
-  <0,0,0> 
-}
-camera {
-  location
-  <0.0,1.4,4.0>
-  direction
-  <0,0,1.5>
-  look_at
-  <0,0.3,0>
-  blur_samples
-  50
-  right
-  <1.0,0,0>
-  right
-  <1.0,0,0> 
-}
-global_settings{
-  
-}
-  '''
-  with open(pov_scene_file, 'w+') as fd:
-    fd.write(scene_src)
-
   print('Rendering {}'.format(pov_scene_file))
 
   # Render it!
@@ -138,12 +75,17 @@ global_settings{
 
   print('.icns verify output = {}'.format([x for x in icnsutil.IcnsFile.verify(icon_icns)]))
 
-  # Just for jeff to inspect stuff
-  if '/j/' in os.environ.get('HOME', ''):
+  if display_cmd is not None:
     largest_icon = [x for x in icon_pngs([(w, h)])][-1]
-    subprocess.run(['feh', largest_icon ], check=False)
+    subprocess.run(display_cmd + [ largest_icon ], check=False)
 
   
+if __name__ == '__main__':
+  # Allow testing va a render of 256x256 size via
+  # python -m btool.icon_gen
+  gen_icons('htir_app_icon.pov', icon_sizes=[(512, 512)], display_cmd=['feh'])
+
+
 
 
 
