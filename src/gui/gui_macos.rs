@@ -47,6 +47,7 @@ struct BasicApp {
 #[derive(Debug)]
 struct BasicWindow {
   pub toolbar: Toolbar<BasicToolbar>,
+  pub content: WebView<WebViewInstance>
 }
 
 impl Default for BasicApp {
@@ -54,8 +55,15 @@ impl Default for BasicApp {
       BasicApp {
         window: Window::with({
           let mut config = WindowConfig::default();
-          config.set_styles(&[WindowStyle::UnifiedTitleAndToolbar]); // Big toolbars \o/
-          //config.toolbar_style = WindowToolbarStyle::Unified; // Big toolbars \o/
+          config.set_styles(&[
+            WindowStyle::UnifiedTitleAndToolbar,
+            WindowStyle::Titled,
+            WindowStyle::Closable,
+            WindowStyle::Miniaturizable,
+            WindowStyle::Resizable,
+            // WindowStyle::FullSizeContentView, // someday
+          ]);
+          config.toolbar_style = WindowToolbarStyle::Unified; // Big toolbars \o/
           config
         }, BasicWindow::default() ),
       }
