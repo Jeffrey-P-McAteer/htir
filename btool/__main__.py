@@ -83,7 +83,8 @@ if is_macos_host():
     CFBundleDisplayName='HTIR',
     CFBundleName='HTIR',
     CFBundleExecutable=os.path.join('HTIR'),
-    CFBundleIconFile=os.path.join('Contents', 'Resources', 'AppIcon.icns'),
+    CFBundleIconFile=os.path.join('Contents', 'Resources', 'AppIcon.icns'), # Legacy apparently?
+    #CFBundleIconName='', # TODO research asset catalog & use this; potential light + dark-mode icons?
     CFBundleIdentifier='pw.jmcateer.htir-client',
     NSHighResolutionCapable=True,
   )

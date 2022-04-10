@@ -31,7 +31,11 @@ def gen_icons(pov_scene_file, icon_sizes=None, display_cmd=None):
 
   icnsutil = utils.import_maybe_installing_with_pip('icnsutil')
   PIL = utils.import_maybe_installing_with_pip('PIL', pkg_name='Pillow')
-  for req_bin in ['povray', 'magick']:
+  povray_bin_name = 'povray'
+  if os.name == 'nt': # if is windows host
+    povray_bin_name = 'pvengine'
+    
+  for req_bin in [povray_bin_name, 'magick']:
     if not shutil.which(req_bin):
       raise Exception('''
   WARNING: you do not have the command "{req_bin}" installed, we depend on for rendering icons!
@@ -51,7 +55,7 @@ def gen_icons(pov_scene_file, icon_sizes=None, display_cmd=None):
       if is_source_newer(pov_scene_file, icon_png):
         # https://www.mankier.com/1/povray
         cmd = [
-          shutil.which('povray'),
+          shutil.which(povray_bin_name),
           pov_scene_file,
           'DECLARE=SL_r={}'.format(scene_light), # used in the .pov scene to render different chunks which are merged into final icon image
           'DECLARE=SL_g={}'.format(scene_light),
