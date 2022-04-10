@@ -1,25 +1,47 @@
-background {
-  color
-  <0.75,0.75,0.85> 
+
+// Used for a multi-pass render which creates alpha from BG difference, keeping shadows!
+#ifndef (SL_r)
+  #declare SL_r = 1 ;
+#end
+#ifndef (SL_g)
+  #declare SL_g = 1 ;
+#end
+#ifndef (SL_b)
+  #declare SL_b = 1 ;
+#end
+
+#declare SceneLight = rgb<SL_r,SL_g,SL_b> ;
+
+// Coordinate system: [left-right (x), up-down (y), near-far (z)]
+
+global_settings {
+  //assumed_gamma 1
+  max_trace_level 15
 }
-light_source {
-  <0,0,0>
-  color
-  <0.9,0.9,0.9>
-  translate
-  <0,5,5.0> 
+
+background { color SceneLight }
+box {
+  <4,-0.6,2>, <-4,-0.61,-2>
+  pigment {
+      color SceneLight
+  }
 }
-light_source {
-  <0,0,0>
-  color
-  <0.15,0.15,0.25>
-  translate
-  <1,6,4.0> 
+
+light_source { // Primary scene soft light just offset from center
+  <0.5,6,3>
+  color rgb<1.9,1.9,1.9> // lowest we can go w/o creating obnoxious 2d shadow
+  area_light
+  <2,0,0> <0,0,2>
+  4,4 // numbers in directions
+  adaptive 0  // 0,1,2,3...
+  jitter // random softening
 }
+
+
 cylinder {
   <0.0,-0.6,0.0>
-  <0.0,0.6,0.0>
-  0.6
+  <0.0,0.9,0.0>
+  0.8
   texture {
     pigment {
       color
@@ -39,7 +61,9 @@ cylinder {
   rotate
   <0,0,0> 
 }
+
 camera {
+  perspective
   location
   <0.0,1.4,4.0>
   direction
@@ -53,6 +77,4 @@ camera {
   right
   <1.0,0,0> 
 }
-global_settings{
-  
-}
+
