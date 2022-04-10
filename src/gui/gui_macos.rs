@@ -47,7 +47,7 @@ struct BasicApp {
 #[derive(Debug)]
 struct BasicWindow {
   pub toolbar: Toolbar<BasicToolbar>,
-  pub content: WebView<WebViewInstance>
+  //pub content: WebView<WebViewInstance>, // TODO?
 }
 
 impl Default for BasicApp {
