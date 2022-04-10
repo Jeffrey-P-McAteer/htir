@@ -1,8 +1,6 @@
 
 use crate::config::Args;
 
-use std::io::Write;
-
 use cacao::macos::{
   App, AppDelegate,
   window::Window, window::WindowDelegate, window::WindowConfig, window::WindowStyle, window::WindowToolbarStyle,
