@@ -9,6 +9,7 @@ use cacao::macos::{
   menu::Menu, menu::MenuItem,
   toolbar::Toolbar, toolbar::ToolbarDelegate, toolbar::ToolbarDisplayMode, toolbar::ToolbarItem, toolbar::ItemIdentifier
 };
+use cacao::button::Button;
 
 pub fn open_gui(_args: &Args) -> Result<(), Box<dyn std::error::Error>> {
   let app = App::new("com.hello.world", BasicApp::default());
@@ -40,7 +41,8 @@ pub fn open_gui(_args: &Args) -> Result<(), Box<dyn std::error::Error>> {
 
 #[derive(Default)]
 struct BasicApp {
-    window: Window
+    pub window: Window,
+    pub toolbar: Toolbar<BasicToolbar>,
 }
 
 impl AppDelegate for BasicApp {
@@ -49,7 +51,7 @@ impl AppDelegate for BasicApp {
         self.window.set_title("HTIR Client");
         self.window.set_movable_by_background(true);
         self.window.set_titlebar_appears_transparent(false);
-        self.window.set_toolbar(BasicToolbar::default());
+        self.window.set_toolbar(&self.toolbar);
 
         self.window.show();
     }
