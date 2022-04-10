@@ -83,6 +83,7 @@ if is_macos_host():
     CFBundleExecutable=os.path.join('HTIR'),
     CFBundleIconFile=os.path.join('Contents', 'Resources', 'AppIcon.icns'),
     CFBundleIdentifier='pw.jmcateer.htir-client',
+    NSHighResolutionCapable=True,
   )
 
   with open(os.path.join(HTIR_app, 'Contents', 'Info.plist'), 'wb') as fd:
