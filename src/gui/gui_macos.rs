@@ -61,7 +61,7 @@ impl Default for BasicApp {
             WindowStyle::Resizable,
             // WindowStyle::FullSizeContentView, // someday
           ]);
-          config.toolbar_style = WindowToolbarStyle::Unified; // Big toolbars \o/
+          config.toolbar_style = WindowToolbarStyle::UnifiedCompact; // Big toolbars \o/
           config
         }, BasicWindow::default() ),
       }
