@@ -80,6 +80,8 @@ if is_macos_host():
   plistlib = utils.import_maybe_installing_with_pip('plistlib')
 
   plist_data = dict(
+    CFBundleDisplayName='HTIR',
+    CFBundleName='HTIR',
     CFBundleExecutable=os.path.join('HTIR'),
     CFBundleIconFile=os.path.join('Contents', 'Resources', 'AppIcon.icns'),
     CFBundleIdentifier='pw.jmcateer.htir-client',

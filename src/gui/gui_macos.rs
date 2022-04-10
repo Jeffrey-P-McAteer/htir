@@ -5,7 +5,7 @@ use std::io::Write;
 
 use cacao::macos::{
   App, AppDelegate,
-  window::Window, window::WindowDelegate, window::WindowConfig, window::WindowToolbarStyle,
+  window::Window, window::WindowDelegate, window::WindowConfig, window::WindowStyle, window::WindowToolbarStyle,
   menu::Menu, menu::MenuItem,
   toolbar::Toolbar, toolbar::ToolbarDelegate, toolbar::ToolbarDisplayMode, toolbar::ToolbarItem, toolbar::ItemIdentifier
 };
@@ -54,6 +54,7 @@ impl Default for BasicApp {
       BasicApp {
         window: Window::with({
           let mut config = WindowConfig::default();
+          config.set_styles(&[WindowStyle::UnifiedTitleAndToolbar]); // Big toolbars \o/
           config.toolbar_style = WindowToolbarStyle::Unified; // Big toolbars \o/
           config
         }, BasicWindow::default() ),
