@@ -96,6 +96,7 @@ choco install -y imagemagick pov-ray rust python3 mingw
 # For any missing binaries you will also need to add
 # the directories where they were installed to
 # to your PATH under Start > Edit Your Account Environment Variables > PATH
+# You will also need the MSVC C/C++ redistributables available at https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019
 ```
 
 MacOS (using the (Homebrew)[https://brew.sh/] package manager):
