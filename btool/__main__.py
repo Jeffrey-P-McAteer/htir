@@ -19,19 +19,31 @@ import inspect
 from . import icon_gen
 from . import utils
 
-def is_windows_host():
-  return os.name == 'nt'
+from . import build_common_pre_exe
+from . import build_linux
+from . import build_macos
+from . import build_windows
+from . import build_common_post_exe
 
-def is_macos_host():
-  return 'darwin' in platform.system().lower()
+utils.cd_up_to_repo_root()
 
+build_common_pre_exe.build_all()
 
-# Normalize getting to repo root from any sub-directory
-for _ in range(0, 12):
-  if not (os.path.exists('.gitignore') and os.path.exists('readme.md')):
-    os.chdir('..')
-if not os.path.exists('target'):
-  os.makedirs('target')
+if utils.can_compile_linux():
+  print('Compiling all Linux targets...')
+  build_linux.build_all()
+
+if utils.can_compile_macos():
+  print('Compiling all MacOS targets...')
+  build_macos.build_all()
+
+if utils.can_compile_windows():
+  print('Compiling all Windows targets...')
+  build_windows.build_all()
+
+build_common_post_exe.build_all()
+
+sys.exit(0)
 
 # Uses a 3rd-party renderer & python code to render high-quality .png and generate a .icns file under ./target/
 icon_gen.gen_icons(os.path.abspath(os.path.join('htir_app_icon.pov')))
