@@ -15,6 +15,12 @@ from . import icon_gen
 from . import utils
 
 def build_all():
+  utils.del_env_vars('CC', 'CXX')
+  utils.maybe_set_env_vals_if_bin_exists(
+    ('CC', ['x86_64-apple-darwin14-clang', 'x86_64-apple-darwin15-clang']),
+    ('CXX', ['x86_64-apple-darwin14-clang++', 'x86_64-apple-darwin15-clang++'])
+  )
+
   if utils.is_x64_host():
     subprocess.run(['cargo', 'build', '--release', '--target', 'x86_64-apple-darwin'], check=True)
 

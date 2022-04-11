@@ -15,6 +15,8 @@ from . import icon_gen
 from . import utils
 
 def build_all():
+  utils.del_env_vars('CC', 'CXX')
+
   if utils.is_x64_host():
     subprocess.run(['cargo', 'build', '--release', '--target', 'x86_64-unknown-linux-gnu'], check=True)
 

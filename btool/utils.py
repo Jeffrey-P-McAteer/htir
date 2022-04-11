@@ -25,12 +25,6 @@ def import_maybe_installing_with_pip(import_name, pkg_name=None):
   
   return importlib.import_module(import_name)
 
-def create_misc_directories_we_assume_exist():
-  cd_up_to_repo_root()
-  if not os.path.exists('target'):
-    os.makedirs('target')
-
-
 def cd_up_to_repo_root():
   # Normalize getting to repo root from any sub-directory
   for _ in range(0, 12):
@@ -73,6 +67,22 @@ def is_aarch64_host():
     'aarch64' in platform.machine().lower()
   )
 
+
+def maybe_set_env_vals_if_bin_exists(*args):
+  for env_var, bins in list(args):
+    b_to_set = None
+    for b in bins:
+      if shutil.which(b):
+        b_to_set = shutil.which(b)
+
+    if b_to_set is not None:
+      print('{}={}'.format(env_var, b_to_set))
+      os.environ[env_var] = b_to_set
+
+def del_env_vars(*args):
+  for env_var in list(args):
+    if env_var in os.environ:
+      del os.environ[env_var]
 
 
 

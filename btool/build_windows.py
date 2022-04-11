@@ -15,6 +15,12 @@ from . import icon_gen
 from . import utils
 
 def build_all():
+  utils.del_env_vars('CC', 'CXX')
+  utils.maybe_set_env_vals_if_bin_exists(
+    ('CC', ['x86_64-w64-mingw32-gcc']),
+    ('CXX', ['x86_64-w64-mingw32-g++'])
+  )
+
   if utils.is_x64_host():
     subprocess.run(['cargo', 'build', '--release', '--target', 'x86_64-pc-windows-msvc'], check=True)
 
