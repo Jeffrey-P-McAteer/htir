@@ -17,8 +17,10 @@ from . import utils
 def build_all():
   utils.del_env_vars('CC', 'CXX')
   utils.maybe_set_env_vals_if_bin_exists(
-    ('CC', ['x86_64-apple-darwin14-clang', 'x86_64-apple-darwin15-clang']),
-    ('CXX', ['x86_64-apple-darwin14-clang++', 'x86_64-apple-darwin15-clang++']),
+    #('CC', ['x86_64-apple-darwin14-clang', 'x86_64-apple-darwin15-clang']),
+    #('CXX', ['x86_64-apple-darwin14-clang++', 'x86_64-apple-darwin15-clang++']),
+    ('CC', ['o64-clang']),
+    ('CXX', ['o64-clang++'])
   )
 
   if utils.is_x64_host():

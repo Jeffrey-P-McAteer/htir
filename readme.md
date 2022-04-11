@@ -139,3 +139,12 @@ TODO document quick setups for the crummier OSes and Gentoo.
  - `cfg(any(target_os = "linux", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))`
     - we will use gtk4 to provide graphics; this means development and client machines need `gtk4` installed and available.
 
+
+## Research
+
+ - https://wapl.es/rust/2019/02/17/rust-cross-compile-linux-to-macos.html
+ - https://github.com/phracker/MacOSX-SDKs/releases
+ - https://stackoverflow.com/questions/31492799/cross-compile-a-rust-application-from-linux-to-windows
+
+
+
