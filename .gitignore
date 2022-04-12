@@ -19,3 +19,5 @@ __pycache__/
 *.pyc
 # *.lock # tracking Cargo.lock is actually kinda useful.
 
+# btool will create this on hosts that need it
+.cargo/
