@@ -31,8 +31,8 @@ light_source { // Primary scene soft light just offset from center
   <0.5,6,3>
   color rgb<1.9,1.9,1.9> // lowest we can go w/o creating obnoxious 2d shadow
   area_light
-  <2,0,0> <0,0,2>
-  4,4 // numbers in directions
+  <1.2,0,0> <0,0,1.2>
+  12,12 // quality numbers in directions..?
   adaptive 0  // 0,1,2,3...
   jitter // random softening
 }
@@ -60,6 +60,70 @@ cylinder {
   }
   rotate
   <0,0,0> 
+}
+
+box { // left-most box edge
+  <1.0,-0.6,1.0>, <0.8,-0.1,-1.0>
+  texture {
+    pigment {
+      color
+      <0.8,0.8,0.8> 
+    }
+    finish {
+      specular
+      0.9
+    }
+  }
+}
+
+box { // right-most box edge
+  <-1.0,-0.6,1.0>, <-0.8,-0.1,-1.0>
+  texture {
+    pigment {
+      color
+      <0.8,0.8,0.8> 
+    }
+    finish {
+      specular
+      0.9
+    }
+  }
+}
+
+box { // front-most box edge
+  <-1.0,-0.6,0.8>, <1.0,-0.1,1.0>
+  texture {
+    pigment {
+      color
+      <0.8,0.8,0.8> 
+    }
+    finish {
+      specular
+      0.9
+    }
+  }
+}
+
+difference {
+  box { // front-most box edge
+    <-1.0,-0.6,1.0>, <1.0,-0.1,1.05>
+    texture {
+      pigment {
+        color
+        <0.8,0.8,0.8> 
+      }
+      finish {
+        specular
+        0.9
+      }
+    }
+  }
+  text {
+    ttf "crystal.ttf" "HTIR" 11, -0.3
+    pigment { color <0.1,0.1,0.1>  }
+    finish { reflection .25 specular 1 }
+    translate <-0.5, 0.0, 0.0>
+  }
 }
 
 camera {
