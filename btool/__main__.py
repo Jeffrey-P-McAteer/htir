@@ -43,6 +43,8 @@ if utils.can_compile_windows():
 
 build_common_post_exe.build_all()
 
+print('TODO move test logic someplace & call it here!')
+
 sys.exit(0)
 
 # Uses a 3rd-party renderer & python code to render high-quality .png and generate a .icns file under ./target/
