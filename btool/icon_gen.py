@@ -72,12 +72,8 @@ def gen_icons(pov_scene_file, icon_sizes=None, display_cmd=None):
           '+O{}'.format(icon_png),
         ]
         print('> {}'.format(' '.join(cmd)))
-        # Only print output on errors, direct stderr to stdout for subprocess
-        try:
-          out = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-        except subprocess.CalledProcessError as error:
-          traceback.print_exc()
-          print('\nError running povray, exit code {}\n\n{}\n'.format(error.returncode, error.output.decode('utf-8') ))
+        
+        utils.run_silent_cmd(*cmd)
 
     icon_png = next( icon_pngs([(w, h)]) )
 

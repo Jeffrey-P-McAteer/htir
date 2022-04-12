@@ -16,7 +16,8 @@ from . import utils
 
 def build_all():
   # Now that we have all target .exes built, package them
-  build_macos_app_bundle()
+  if utils.can_compile_macos():
+    build_macos_app_bundle()
   
   print_macos_exe_locations()
 
@@ -36,10 +37,10 @@ def print_linux_exe_locations():
   )
 
   if linux_client_exe:
-    print('Linux client is located at {}'.format(linux_client_exe))
+    print('Linux client is located at {}'.format(os.path.abspath(linux_client_exe)))
 
   if linux_server_exe:
-    print('Linux server is located at {}'.format(linux_server_exe))
+    print('Linux server is located at {}'.format(os.path.abspath(linux_server_exe)))
 
 
 def print_windows_exe_locations():
@@ -55,10 +56,10 @@ def print_windows_exe_locations():
   )
 
   if windows_client_exe:
-    print('Windows client.exe is located at {}'.format(windows_client_exe))
+    print('Windows client.exe is located at {}'.format(os.path.abspath(windows_client_exe)))
 
   if windows_server_exe:
-    print('Windows server.exe is located at {}'.format(windows_server_exe))
+    print('Windows server.exe is located at {}'.format(os.path.abspath(windows_server_exe)))
 
 def print_macos_exe_locations():
   macos_client_exe = utils.get_first_existing(
@@ -71,10 +72,10 @@ def print_macos_exe_locations():
   )
 
   if macos_client_exe:
-    print('MacOS client is located at {}'.format(macos_client_exe))
+    print('MacOS client is located at {}'.format(os.path.abspath(macos_client_exe)))
 
   if macos_server_exe:
-    print('MacOS server is located at {}'.format(macos_server_exe))
+    print('MacOS server is located at {}'.format(os.path.abspath(macos_server_exe)))
     
 
 def build_macos_app_bundle():
@@ -114,6 +115,56 @@ def build_macos_app_bundle():
 
 
   print('MacOS HTIR Client .app created at {}'.format(HTIR_app))
+
+
+  # Now put .app in .dmg w/ background image!
+  if shutil.which('mkfs.hfsplus'):
+    dmg_image_size_bytes = utils.directory_size_bytes(HTIR_app)
+    dmg_image_size_bytes *= 1.15 # assume hfs+ needs 15% overhead for bookkeeping
+
+    dmg_image_size_mbytes = int(dmg_image_size_bytes / 1000000)
+
+    dmg_file = os.path.abspath(os.path.join('target', 'HTIR.dmg'))
+    dmg_mountpoint = os.path.abspath(os.path.join('target', 'HTIR.dmg_mount'))
+
+    if os.path.exists(dmg_mountpoint):
+      subprocess.run(['sudo', 'umount', dmg_mountpoint], check=False) # not fatal if process dies, we just need to try before removing .dmg file
+    os.makedirs(dmg_mountpoint, exist_ok=True)
+
+    if os.path.exists(dmg_file):
+      os.remove(dmg_file)
+
+    utils.run_silent_cmd('dd', 'if=/dev/zero', 'of={}'.format(dmg_file), 'bs=1M', 'count={}'.format(dmg_image_size_mbytes))
+    utils.run_silent_cmd('mkfs.hfsplus', '-v', 'InstallHTIR', '-M', '777', dmg_file)
+
+    utils.run_silent_cmd('sudo', 'mount', '-o', 'loop', dmg_file, dmg_mountpoint)
+
+    shutil.copytree(HTIR_app, os.path.join(dmg_mountpoint, os.path.basename(HTIR_app)))
+    # .dmg contains ./HTIR.app, anything else?
+
+    subprocess.run(['sudo', 'umount', dmg_mountpoint], check=False)
+    os.rmdir(dmg_mountpoint)
+
+    print('MacOS HTIR Client .cmd created at {}'.format(dmg_file))
+
+  elif shutil.which('hdiutil'):
+    dmg_file = os.path.abspath(os.path.join('target', 'HTIR.dmg'))
+    dmg_mountpoint = os.path.abspath(os.path.join('target', 'HTIR.dmg_mount'))
+    if os.path.exists(dmg_mountpoint):
+      shutil.rmtree(dmg_mountpoint)
+    os.makedirs(dmg_mountpoint, exist_ok=True)
+
+    shutil.copytree(HTIR_app, os.path.join(dmg_mountpoint, os.path.basename(HTIR_app)))
+    # .dmg contains ./HTIR.app, anything else?
+
+    utils.run_silent_cmd(
+      'hdiutil', 'create', '-volname', 'InstallHTIR', '-srcfolder', dmg_mountpoint, '-ov', '-format', 'UDZO', dmg_file
+    )
+
+    print('MacOS HTIR Client .cmd created at {}'.format(dmg_file))
+
+
+
 
 
 

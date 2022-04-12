@@ -43,7 +43,10 @@ def is_linux_host():
 
 
 def can_compile_windows():
-  return is_windows_host() or (is_linux_host() and shutil.which('x86_64-w64-mingw32-cc') is not None)
+  return is_windows_host() or (
+    is_linux_host() and
+    shutil.which('x86_64-w64-mingw32-cc') is not None
+  )
 
 def can_compile_macos():
   # x86_64-apple-darwin15-clang comes from https://wapl.es/rust/2019/02/17/rust-cross-compile-linux-to-macos.html
@@ -96,4 +99,27 @@ def get_first_existing(*files):
     if os.path.exists(f):
       return f
   return None
+
+# Thanks https://stackoverflow.com/a/1392549/9252743
+def directory_size_bytes(directory):
+  total_size = 0
+  for dirpath, dirnames, filenames in os.walk(directory):
+    for f in filenames:
+      file_path = os.path.join(dirpath, f)
+      # skip if it is symbolic link
+      if not os.path.islink(file_path):
+        total_size += os.path.getsize(file_path)
+
+  return total_size
+
+# Runs given command, printing errors if return code != 0
+def run_silent_cmd(*cmd_args, cwd=None):
+  cmd = list([x for x in cmd_args if x is not None])
+  try:
+    out = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+  except subprocess.CalledProcessError as error:
+    traceback.print_exc()
+    print('Error running:')
+    print('> {}'.format(' '.join(cmd)))
+    print('exit code {}\n{}\n'.format(error.returncode, error.output.decode('utf-8') ))
 

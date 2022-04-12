@@ -109,6 +109,15 @@ Arch Linux:
 
 ```bash
 yay -Syu povray imagemagick rust python
+
+# Optional thing: macos cross compilation:
+#  > manually setup https://github.com/tpoechtrager/osxcross
+yay -Syu hfsprogs
+rustup target add x86_64-apple-darwin
+
+# Optional thing: windows cross compilation:
+yay -Syu mingw-w64
+rustup target add x86_64-pc-windows-gnu
 ```
 
 TODO document quick setups for the crummier OSes and Gentoo.
