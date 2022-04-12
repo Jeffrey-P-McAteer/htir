@@ -144,13 +144,13 @@ def build_macos_app_bundle():
     # Begin adding to .dmg
     shutil.copytree(HTIR_app, os.path.join(dmg_mountpoint, os.path.basename(HTIR_app)))
 
-    spotlight_vol_plist = os.path.join(dmg_mountpoint, '.Spotlight-V100', 'VolumeConfiguration.plist')
-    os.makedirs(os.path.dirname(spotlight_vol_plist), exist_ok=True)
-    plist_data = dict(
-      
-    )
-    with open(os.path.join(spotlight_vol_plist), 'wb') as fd:
-      plistlib.dump(plist_data, fd)
+    #spotlight_vol_plist = os.path.join(dmg_mountpoint, '.Spotlight-V100', 'VolumeConfiguration.plist')
+    #os.makedirs(os.path.dirname(spotlight_vol_plist), exist_ok=True)
+    #plist_data = dict(
+    #  
+    #)
+    #with open(os.path.join(spotlight_vol_plist), 'wb') as fd:
+    #  plistlib.dump(plist_data, fd)
 
     # End adding to .dmg
 
