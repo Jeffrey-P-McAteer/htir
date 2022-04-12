@@ -3,7 +3,7 @@ use crate::config::Args;
 use crate::util;
 
 use winsafe::prelude::*;
-use winsafe::{gui, POINT, SIZE, WinResult};
+use winsafe::{gui, POINT, SIZE, /*WinResult*/};
 
 pub fn open_gui(args: &Args) -> Result<(), Box<dyn std::error::Error>> {
   if !args.debug {

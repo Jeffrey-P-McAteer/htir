@@ -2,7 +2,7 @@
 use crate::config::Args;
 
 use gtk4::prelude::*;
-use gtk4::{Application, ApplicationWindow, Button};
+use gtk4::{Application, ApplicationWindow, /*Button*/};
 use glib;
 
 pub fn open_gui(_args: &Args) -> Result<(), Box<dyn std::error::Error>> {
