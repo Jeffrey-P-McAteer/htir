@@ -120,7 +120,7 @@ def build_macos_app_bundle():
   # Now put .app in .dmg w/ background image!
   if shutil.which('mkfs.hfsplus'):
     dmg_image_size_bytes = utils.directory_size_bytes(HTIR_app)
-    dmg_image_size_bytes *= 1.15 # assume hfs+ needs 15% overhead for bookkeeping
+    dmg_image_size_bytes *= 1.35 # assume hfs+ needs 35% overhead for bookkeeping
 
     dmg_image_size_mbytes = int(dmg_image_size_bytes / 1000000)
 
@@ -146,6 +146,7 @@ def build_macos_app_bundle():
     os.rmdir(dmg_mountpoint)
 
     print('MacOS HTIR Client .cmd created at {}'.format(dmg_file))
+
 
   elif shutil.which('hdiutil'):
     dmg_file = os.path.abspath(os.path.join('target', 'HTIR.dmg'))
