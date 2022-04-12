@@ -47,7 +47,13 @@ def can_compile_windows():
 
 def can_compile_macos():
   # x86_64-apple-darwin15-clang comes from https://wapl.es/rust/2019/02/17/rust-cross-compile-linux-to-macos.html
-  return is_macos_host() or (is_linux_host() and (shutil.which('x86_64-apple-darwin15-clang') is not None or shutil.which('x86_64-apple-darwin14-clang') is not None))
+  return is_macos_host() or (
+    is_linux_host() and (
+      shutil.which('x86_64-apple-darwin15-clang') is not None or # Older libs for 10.x stuff
+      shutil.which('x86_64-apple-darwin14-clang') is not None or
+      shutil.which('o64-clang') is not None # newer osxcross compiler
+    )
+  )
 
 def can_compile_linux():
   return is_linux_host()

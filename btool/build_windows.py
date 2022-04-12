@@ -22,11 +22,19 @@ def build_all():
   )
 
   if utils.is_x64_host():
-    subprocess.run(['cargo', 'build', '--release', '--target', 'x86_64-pc-windows-msvc'], check=True)
+    if utils.is_linux_host():
+      subprocess.run(['cargo', 'build', '--release', '--target', 'x86_64-pc-windows-gnu'], check=True)
+    else:
+      subprocess.run(['cargo', 'build', '--release', '--target', 'x86_64-pc-windows-msvc'], check=True)
 
   elif utils.is_aarch64_host():
-    subprocess.run(['cargo', 'build', '--release', '--target', 'aarch64-pc-windows-msvc'], check=True)
+    if utils.is_linux_host():
+      #subprocess.run(['cargo', 'build', '--release', '--target', 'aarch64-pc-windows-gnu'], check=True)
+      raise Exception('GNU does not publish anything for the aarch64-pc-windows-gnu target triple!')
+    else:
+      subprocess.run(['cargo', 'build', '--release', '--target', 'aarch64-pc-windows-msvc'], check=True)
 
   else:
     raise Exception('Unknown host CPU type!')
+
 
