@@ -17,9 +17,65 @@ from . import utils
 def build_all():
   # Now that we have all target .exes built, package them
   build_macos_app_bundle()
+  
+  print_macos_exe_locations()
+
+  print_windows_exe_locations()
+
+  print_linux_exe_locations()
 
 
+def print_linux_exe_locations():
+  linux_client_exe = utils.get_first_existing(
+    os.path.join('target', 'x86_64-unknown-linux-gnu', 'release', 'client'),
+    os.path.join('target', 'aarch64-unknown-linux-gnu', 'release', 'client'),
+  )
+  linux_server_exe = utils.get_first_existing(
+    os.path.join('target', 'x86_64-unknown-linux-gnu', 'release', 'server'),
+    os.path.join('target', 'aarch64-unknown-linux-gnu', 'release', 'server'),
+  )
 
+  if linux_client_exe:
+    print('Linux client is located at {}'.format(linux_client_exe))
+
+  if linux_server_exe:
+    print('Linux server is located at {}'.format(linux_server_exe))
+
+
+def print_windows_exe_locations():
+  windows_client_exe = utils.get_first_existing(
+    os.path.join('target', 'x86_64-pc-windows-gnu', 'release', 'client.exe'),
+    os.path.join('target', 'x86_64-pc-windows-msvc', 'release', 'client.exe'),
+    os.path.join('target', 'aarch64-pc-windows-msvc', 'release', 'client.exe'),
+  )
+  windows_server_exe = utils.get_first_existing(
+    os.path.join('target', 'x86_64-pc-windows-gnu', 'release', 'server.exe'),
+    os.path.join('target', 'x86_64-pc-windows-msvc', 'release', 'server.exe'),
+    os.path.join('target', 'aarch64-pc-windows-msvc', 'release', 'server.exe'),
+  )
+
+  if windows_client_exe:
+    print('Windows client.exe is located at {}'.format(windows_client_exe))
+
+  if windows_server_exe:
+    print('Windows server.exe is located at {}'.format(windows_server_exe))
+
+def print_macos_exe_locations():
+  macos_client_exe = utils.get_first_existing(
+    os.path.join('target', 'x86_64-apple-darwin', 'release', 'client'),
+    os.path.join('target', 'aarch64-apple-darwin', 'release', 'client'),
+  )
+  macos_server_exe = utils.get_first_existing(
+    os.path.join('target', 'x86_64-apple-darwin', 'release', 'server'),
+    os.path.join('target', 'aarch64-apple-darwin', 'release', 'server'),
+  )
+
+  if macos_client_exe:
+    print('MacOS client is located at {}'.format(macos_client_exe))
+
+  if macos_server_exe:
+    print('MacOS server is located at {}'.format(macos_server_exe))
+    
 
 def build_macos_app_bundle():
   client_exe = os.path.abspath( os.path.join( 'target', 'x86_64-apple-darwin', 'release', 'client' ) )
@@ -57,7 +113,7 @@ def build_macos_app_bundle():
     plistlib.dump(plist_data, fd)
 
 
-  print('MacOS .app created at {}'.format(HTIR_app))
+  print('MacOS HTIR Client .app created at {}'.format(HTIR_app))
 
 
 

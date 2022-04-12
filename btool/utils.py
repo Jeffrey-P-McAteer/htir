@@ -91,5 +91,9 @@ def del_env_vars(*args):
       del os.environ[env_var]
 
 
-
+def get_first_existing(*files):
+  for f in list(files):
+    if os.path.exists(f):
+      return f
+  return None
 
