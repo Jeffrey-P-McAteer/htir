@@ -11,6 +11,8 @@ import time
 import multiprocessing
 import inspect
 
+import plistlib # apparently python just ships with this on all platforms?
+
 from . import icon_gen
 from . import utils
 
@@ -98,7 +100,7 @@ def build_macos_app_bundle():
       pass # why bother? Ugh.
 
   # Finally create Contents/Info.plist
-  plistlib = utils.import_maybe_installing_with_pip('plistlib')
+  #plistlib = utils.import_maybe_installing_with_pip('plistlib') # python SHIPS with this! Woah.
 
   plist_data = dict(
     CFBundleDisplayName='HTIR',
@@ -139,13 +141,23 @@ def build_macos_app_bundle():
 
     utils.run_silent_cmd('sudo', 'mount', '-o', 'loop', dmg_file, dmg_mountpoint)
 
+    # Begin adding to .dmg
     shutil.copytree(HTIR_app, os.path.join(dmg_mountpoint, os.path.basename(HTIR_app)))
-    # .dmg contains ./HTIR.app, anything else?
+
+    spotlight_vol_plist = os.path.join(dmg_mountpoint, '.Spotlight-V100', 'VolumeConfiguration.plist')
+    os.makedirs(os.path.dirname(spotlight_vol_plist), exist_ok=True)
+    plist_data = dict(
+      
+    )
+    with open(os.path.join(spotlight_vol_plist), 'wb') as fd:
+      plistlib.dump(plist_data, fd)
+
+    # End adding to .dmg
 
     subprocess.run(['sudo', 'umount', dmg_mountpoint], check=False)
     os.rmdir(dmg_mountpoint)
 
-    print('MacOS HTIR Client .cmd created at {}'.format(dmg_file))
+    print('MacOS HTIR Client .dmg created at {}'.format(dmg_file))
 
 
   elif shutil.which('hdiutil'):
@@ -155,8 +167,11 @@ def build_macos_app_bundle():
       shutil.rmtree(dmg_mountpoint)
     os.makedirs(dmg_mountpoint, exist_ok=True)
 
+    # Begin adding to .dmg
     shutil.copytree(HTIR_app, os.path.join(dmg_mountpoint, os.path.basename(HTIR_app)))
     # .dmg contains ./HTIR.app, anything else?
+
+    # End adding to .dmg
 
     utils.run_silent_cmd(
       'hdiutil', 'create', '-volname', 'InstallHTIR', '-srcfolder', dmg_mountpoint, '-ov', '-format', 'UDZO', dmg_file
