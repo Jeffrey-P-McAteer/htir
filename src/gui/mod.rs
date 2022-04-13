@@ -7,18 +7,24 @@
  * use `dyn std::error::Error` to avoid callers having to care about implementation details.
  */
 
-#[cfg(target_os = "windows")]
+// Use win32 graphics if windows & native UI enabled
+
+#[cfg(all(target_os = "windows", feature = "native_ui"))]
 pub mod gui_win32;
-#[cfg(target_os = "windows")]
+#[cfg(all(target_os = "windows", feature = "native_ui"))]
 pub use gui_win32 as gui;
 
-#[cfg(target_os = "macos")]
+// Use cocoa graphics if macos & native UI enabled
+
+#[cfg(all(target_os = "macos", feature = "native_ui"))]
 pub mod gui_macos;
-#[cfg(target_os = "macos")]
+#[cfg(all(target_os = "macos", feature = "native_ui"))]
 pub use gui_macos as gui;
 
-#[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))]
+// Use GTK windows if feature=native_ui not specified OR we are compiling for a unix variant.
+
+#[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd", not(feature="native_ui") ))]
 pub mod gui_unix_gtk;
-#[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))]
+#[cfg(any(target_os = "linux", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd", not(feature="native_ui")))]
 pub use gui_unix_gtk as gui;
 

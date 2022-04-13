@@ -24,10 +24,10 @@ def build_all():
   )
 
   if utils.is_x64_host():
-    subprocess.run(['cargo', 'build', '--release', '--target', 'x86_64-apple-darwin'], check=True)
+    subprocess.run(['cargo', 'build', '--release', '--target', 'x86_64-apple-darwin'] + utils.get_addtl_cargo_args(), check=True)
 
   elif utils.is_aarch64_host():
-    subprocess.run(['cargo', 'build', '--release', '--target', 'aarch64-apple-darwin'], check=True)
+    subprocess.run(['cargo', 'build', '--release', '--target', 'aarch64-apple-darwin'] + utils.get_addtl_cargo_args(), check=True)
 
   else:
     raise Exception('Unknown host CPU type!')

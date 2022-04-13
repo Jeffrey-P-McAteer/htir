@@ -29,6 +29,9 @@ utils.cd_up_to_repo_root()
 
 build_common_pre_exe.build_all()
 
+# Arguments passed to btool will be forwarded to cargo
+utils.set_addtl_cargo_args( sys.argv[1:] )
+
 if utils.can_compile_linux():
   print('Compiling all Linux targets...')
   build_linux.build_all()

@@ -6,6 +6,7 @@ import subprocess
 import shutil
 import time
 import platform
+import json
 
 # Utility method to wrap imports with a call to pip to install first.
 # > "100% idiot-proof!" -- guy on street selling rusty dependency chains.
@@ -122,4 +123,15 @@ def run_silent_cmd(*cmd_args, cwd=None):
     print('Error running:')
     print('> {}'.format(' '.join(cmd)))
     print('exit code {}\n{}\n'.format(error.returncode, error.output.decode('utf-8') ))
+
+def set_addtl_cargo_args(args):
+  os.environ['BTOOL_CARGO_ADDTL_ARGS'] = json.dumps(args)
+
+def get_addtl_cargo_args():
+  args = []
+  try:
+    args = json.loads(os.environ.get('BTOOL_CARGO_ADDTL_ARGS', '[]'))
+  except:
+    traceback.print_exc()
+  return args
 
