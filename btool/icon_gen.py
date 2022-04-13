@@ -118,7 +118,9 @@ def gen_icons(pov_scene_file, icon_sizes=None, display_cmd=None):
           
     img.write(icon_icns, toc=True)
 
-  print('.icns verify output = {}'.format([x for x in icnsutil.IcnsFile.verify(icon_icns)]))
+  icns_verify_errors = [x for x in icnsutil.IcnsFile.verify(icon_icns)]
+  if len(icns_verify_errors) > 0:
+    print('.icns verify output = {}'.format(icns_verify_errors))
 
   # Write windows-specific output! (use first OR closest to 256 size)
   best_icon_size = icon_sizes[0]

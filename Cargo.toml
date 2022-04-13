@@ -9,9 +9,11 @@ build = "build.rs"
 
 [features]
 default = ["native_ui"]
-native_ui = []
+native_ui = ["winapi", "winsafe", "cacao"]
 # ^ native_ui turns on per-os UIs in gui/mod.rs and is
 #   the default GUI framework. If not enabled we use GTK on all OSes.
+gtk_ui = ["gtk4", "glib"]
+
 
 [lib]
 name = "htir"
@@ -33,19 +35,20 @@ sqlite = "0.26"
 dirs = "4.0"
 clap = { version = "3.1", features = ["derive"] }
 
-
+gtk4 = { version = "0.4", optional = true}
+glib = { version = "0.15", optional = true }
 
 [target.'cfg(all(target_os = "windows"))'.dependencies]
-winapi = { version = "0.3", features = ["wincon", "winuser"]}
-winsafe = { version = "0.0.9", features = ["gui"] }
+winapi = { version = "0.3", features = ["wincon", "winuser"], optional = true}
+winsafe = { version = "0.0.9", features = ["gui"], optional = true }
 
 [target.'cfg(windows)'.build-dependencies]
 winres = "0.1"
 
 [target.'cfg(all(target_os = "macos"))'.dependencies]
-cacao = { version = "0.2" }
+cacao = { version = "0.2", optional = true }
 
-[target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies]
-gtk4 = { version = "0.4" }
-glib = { version = "0.15" }
+#[target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))'.dependencies]
+#gtk4 = { version = "0.4" }
+#glib = { version = "0.15" }
 
