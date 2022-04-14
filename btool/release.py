@@ -31,7 +31,7 @@ def main(args=sys.argv):
   ]
 
   asset_staging_dir = os.path.abspath( os.path.join('target', 'release_stage') )
-  os.makedirs(asset_staging_dir, exists_ok=True)
+  os.makedirs(asset_staging_dir, exist_ok=True)
   for f in os.listdir(asset_staging_dir):
     os.remove(os.path.join(asset_staging_dir, f))
 
