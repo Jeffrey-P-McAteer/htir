@@ -125,7 +125,11 @@ TODO document quick setups for the crummier OSes and Gentoo.
 
 # Build Steps
 
-`// TODO`
+The following builds windows `.exe` files on a windows host, macos mach-o and `.app` files on macos, and all 3 on a linux host with `osxcross` and `mingw` installed.
+
+```bash
+python -m btool
+```
 
 # Examples
 
