@@ -177,7 +177,7 @@ def build_macos_app_bundle():
       'hdiutil', 'create', '-volname', 'InstallHTIR', '-srcfolder', dmg_mountpoint, '-ov', '-format', 'UDZO', dmg_file
     )
 
-    print('MacOS HTIR Client .cmd created at {}'.format(dmg_file))
+    print('MacOS HTIR Client .dmg created at {}'.format(dmg_file))
 
 
 
