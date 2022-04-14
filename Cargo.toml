@@ -9,6 +9,7 @@ build = "build.rs"
 
 [features]
 default = []
+force_gtk_ui = ["gtk4", "glib"]
 
 [lib]
 name = "htir"
@@ -29,6 +30,10 @@ sqlite = "0.26"
 
 dirs = "4.0"
 clap = { version = "3.1", features = ["derive"] }
+
+gtk4 = { version = "0.4", optional = true }
+glib = { version = "0.15", optional = true }
+
 
 [target.'cfg(all(target_os = "windows"))'.dependencies]
 winapi = { version = "0.3", features = ["wincon", "winuser"] }
