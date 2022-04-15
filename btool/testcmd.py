@@ -72,9 +72,10 @@ def main(args=sys.argv):
       print('> {}'.format(' '.join(test_cmd)))
       old_test_proc = recompile_and_kill_and_reexec(old_test_proc, test_cmd)
       
-  except Exception as e:
-    if not isinstance(e, KeyboardInterrupt):
-      traceback.print_exc()
+  except KeyboardInterrupt as e:
+    pass
+  except:
+    traceback.print_exc()
 
   
 
