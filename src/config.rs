@@ -10,11 +10,17 @@ pub struct Config {
 
 }
 
-pub fn read_config<'a, P: Into<PathBuf>>(override_config_file: Option<P>) -> Result<Config, Box<dyn std::error::Error>> {
+pub fn read_config<'a, P: Into<PathBuf>>(override_config_file: Option<P>) -> Config {
   if let Some(override_config_file) = override_config_file {
-    return read_config_from_file( override_config_file.into().as_path() );
+    match read_config_from_file( override_config_file.into().as_path() ) {
+      Ok(c) => return c,
+      Err(e) => {
+        eprintln!("read_config_or_default read_config_from_file e={:?}", e);
+        return Config::default();
+      }
+    }
   }
-  Ok(Config::default())
+  return Config::default()
 }
 
 pub fn read_config_from_file(_file: &Path) -> Result<Config, Box<dyn std::error::Error>> {
