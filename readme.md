@@ -160,4 +160,15 @@ python -m btool
  - https://stackoverflow.com/questions/31492799/cross-compile-a-rust-application-from-linux-to-windows
 
 
+## One-liner zoo
 
+```bash
+
+python -m btool.release
+
+python -m btool.testcmd ./target/x86_64-unknown-linux-gnu/release/server
+
+python -m btool.testcmd ./target/x86_64-unknown-linux-gnu/release/client
+
+
+```
