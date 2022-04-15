@@ -16,7 +16,6 @@ import time
 import multiprocessing
 import inspect
 
-from . import icon_gen
 from . import utils
 
 from . import build_common_pre_exe

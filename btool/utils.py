@@ -135,3 +135,10 @@ def get_addtl_cargo_args():
     traceback.print_exc()
   return args
 
+def maybe(callback):
+  try:
+    return callback()
+  except:
+    traceback.print_exc()
+    return None
+
