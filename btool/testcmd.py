@@ -37,13 +37,35 @@ def recompile_and_kill_and_reexec(old_test_proc, cmd_to_exec):
 
   return subprocess.Popen(cmd_to_exec)
 
-def block_until_newer_mtime_in_dir(directory, mtime_to_beat, poll_ms=250):
+dict_of_mtime_file_hashes = {}
+
+def block_until_newer_mtime_in_dir_or_proc_dies(test_proc, directory, mtime_to_beat, poll_ms=250):
+  global dict_of_mtime_file_hashes
   best_mtime = 0
   while best_mtime <= mtime_to_beat:
     time.sleep(poll_ms / 1000.0)
+
+    if test_proc is not None:
+      if test_proc.poll() is not None:
+        # subprocess is dead
+        break
+
     for root, dirs, files in os.walk(directory):
       for f in files:
         f = os.path.join(root, f)
+        
+        # Skip if f's content hash() is the same as the one in dict_of_mtime_file_hashes[f]
+        current_file_hash = ''
+        with open(f, 'r') as fd:
+          current_file_hash = hash(fd.read())
+
+        if f in dict_of_mtime_file_hashes:
+          if dict_of_mtime_file_hashes[f] == current_file_hash:
+            continue
+        
+        # File hash is new/different, compare mtime
+        dict_of_mtime_file_hashes[f] = current_file_hash
+
         f_mtime = os.path.getmtime(f)
         if f_mtime > best_mtime:
           best_mtime = f_mtime
@@ -68,7 +90,7 @@ def main(args=sys.argv):
 
   try:
     while True:
-      mtime_to_beat = block_until_newer_mtime_in_dir(src_dir, mtime_to_beat)
+      mtime_to_beat = block_until_newer_mtime_in_dir_or_proc_dies(old_test_proc, src_dir, mtime_to_beat)
       print('> {}'.format(' '.join(test_cmd)))
       old_test_proc = recompile_and_kill_and_reexec(old_test_proc, test_cmd)
       
@@ -76,6 +98,9 @@ def main(args=sys.argv):
     pass
   except:
     traceback.print_exc()
+
+  if old_test_proc is not None:
+    utils.maybe(lambda: old_test_proc.terminate())
 
   
 

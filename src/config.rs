@@ -1,13 +1,25 @@
 
 use std::path::{Path, PathBuf};
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 use clap::Parser;
 
 
-#[derive(Default, Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct Config {
-  pub some_option: f64,
+  pub server_listen_ip: IpAddr,
+  pub server_listen_port: u16,
 
+}
+
+impl Default for Config {
+  fn default() -> Config {
+    Config {
+      //server_listen_ip: IpAddr::V4( Ipv4Addr::new(0, 0, 0, 0) ),
+      server_listen_ip: IpAddr::V6( Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 0) ), // Pretty much all OSes give us 0.0.0.0 ipv4 as well when ::/0 is specified.
+      server_listen_port: 4430,
+    }
+  }
 }
 
 pub fn read_config<'a, P: Into<PathBuf>>(override_config_file: Option<P>) -> Config {
