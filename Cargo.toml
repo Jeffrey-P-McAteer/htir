@@ -33,8 +33,16 @@ clap = { version = "3.1", features = ["derive"] }
 
 futures-util = { version = "0.3" } #, default-features = false, features = ["sink", "std"] }
 tokio-tungstenite = "*"
+tokio-rustls = "0.23"
+rustls = "0.20"
+rustls-pemfile = "0.2"
+
+serde = { version = "1", features = ["derive"] }
 serde_bare = "0.5.0"
+serde_bytes = "0.11"
+
 ciborium = "0.2.0"
+
 regex = "1"
 
 

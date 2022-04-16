@@ -166,9 +166,9 @@ python -m btool
 
 python -m btool.release
 
-python -m btool.testcmd ./target/x86_64-unknown-linux-gnu/release/server
+python -m btool.testcmd ./target/x86_64-unknown-linux-gnu/release/htir-server
 
-python -m btool.testcmd ./target/x86_64-unknown-linux-gnu/release/client
+python -m btool.testcmd ./target/x86_64-unknown-linux-gnu/release/htir-client
 
 
 ```

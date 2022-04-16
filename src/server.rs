@@ -1,5 +1,9 @@
 
 use std::net::SocketAddr;
+use std::path::{Path, PathBuf};
+use std::fs::File;
+use std::io::BufReader;
+use std::sync::Arc;
 
 use tokio::runtime::{Builder};
 use tokio::net::{TcpListener, TcpStream};
@@ -7,6 +11,9 @@ use tokio::io::{ReadBuf, AsyncWriteExt};
 
 use futures_util::{future, StreamExt, TryStreamExt};
 use futures_util::future::poll_fn;
+
+use tokio_rustls::rustls::{Certificate, PrivateKey};
+use tokio_rustls::TlsAcceptor;
 
 use htir::*;
 
@@ -101,7 +108,36 @@ Location: https://{}
   }
 
   eprintln!("peeked_bytes_from_client={:?}", peeked_bytes_from_client);
-  eprintln!("str::from_utf8(peeked_bytes_from_client)={:?}", std::str::from_utf8(peeked_bytes_from_client)? );
+  eprintln!("str::from_utf8(peeked_bytes_from_client)={:?}", std::str::from_utf8(peeked_bytes_from_client).unwrap_or("<UTF-8 Decode Error>") );
+
+  // Now test if the first 16kb contains a BARE-encoded message we can understand
+  // We use ServerTestStruct for now but later will use a better structure to decode.
+  match serde_bare::from_slice::<ServerTestStruct>(peeked_bytes_from_client) {
+    Ok(server_test_struct) => {
+      eprintln!("serde_bare::from_slice server_test_struct={:?}", server_test_struct);
+      // TODO
+      return Ok(());
+    }
+    Err(e) => {
+      eprintln!("serde_bare::from_slice e={}", e);
+    }
+  }
+
+  // If we're still here then this MUST be an SSL-encrypted tcp stream,
+  // and after decrypting we should check if this is HTTPS or BARE packets
+
+  let certs = load_certs(&PathBuf::from("/j/proj/hackathon-2022-April/ssl/server.crt"))?;
+  let mut keys = load_keys(&PathBuf::from("/j/proj/hackathon-2022-April/ssl/server.key"))?;
+
+  let config = rustls::ServerConfig::builder()
+      .with_safe_defaults()
+      .with_no_client_auth()
+      .with_single_cert(certs, keys.remove(0))
+      .map_err(|err| std::io::Error::new(std::io::ErrorKind::InvalidInput, err))?;
+  
+  let acceptor = TlsAcceptor::from(Arc::new(config));
+
+  let mut stream = acceptor.accept(stream).await?;
 
 
   // We have a plain-text websocket
@@ -119,6 +155,28 @@ Location: https://{}
   // End of session w no errors!
   Ok(())
 }
+
+fn load_certs(path: &Path) -> std::io::Result<Vec<Certificate>> {
+    rustls_pemfile::certs(&mut BufReader::new(File::open(path)?))
+        .map_err(|_| std::io::Error::new(std::io::ErrorKind::InvalidInput, "invalid cert"))
+        .map(|mut certs| certs.drain(..).map(Certificate).collect())
+}
+
+fn load_keys(path: &Path) -> std::io::Result<Vec<PrivateKey>> {
+    rustls_pemfile::rsa_private_keys(&mut BufReader::new(File::open(path)?))
+        .map_err(|_| std::io::Error::new(std::io::ErrorKind::InvalidInput, "invalid key"))
+        .map(|mut keys| keys.drain(..).map(PrivateKey).collect())
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+struct ServerTestStruct {
+  pub a: String,
+  pub b: u64,
+
+  //#[serde(with = "serde_bytes")]
+  //pub b: Vec<u8>,
+}
+
 
 // Yes I _could_ pull in a library, but I want this to be as fast as possible.
 // If we get wierd input I don't need a fully-fledged error message, we're fine giving a broken
