@@ -28,3 +28,6 @@ def build_all():
 
 
 
+if __name__ == '__main__':
+  build_all()
+

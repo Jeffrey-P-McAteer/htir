@@ -32,3 +32,6 @@ def build_all():
   else:
     raise Exception('Unknown host CPU type!')
 
+if __name__ == '__main__':
+  build_all()
+

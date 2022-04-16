@@ -19,11 +19,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
   rt.block_on(async {
     let c = config::read_config::<&str>(None);
+    if let Err(e) = init_server_config(&c).await {
+      eprintln!("Error during init_server_config: {}", e);
+      return;
+    }
     if let Err(e) = server_main(&c).await {
       eprintln!("Error during server_main: {}", e);
     }
   });
 
+  Ok(())
+}
+
+async fn init_server_config(config: &config::Config) -> Result<(), Box<dyn std::error::Error>> {
+
+  // All checks passed!
   Ok(())
 }
 
@@ -123,24 +133,22 @@ fn parse_out_host_from_http_get(http_fragment: &[u8]) -> Vec<u8> {
   let mut host_name_copy = vec![];
 
   for i in 0..(http_fragment.len() - http_host_beginning_bytes.len()) {
-    let is_match = (
+    let is_match = 
       http_host_beginning_bytes[0] == http_fragment[i+0] &&
       http_host_beginning_bytes[1] == http_fragment[i+1] &&
       http_host_beginning_bytes[2] == http_fragment[i+2] &&
       http_host_beginning_bytes[3] == http_fragment[i+3] &&
       http_host_beginning_bytes[4] == http_fragment[i+4] &&
-      http_host_beginning_bytes[5] == http_fragment[i+5]
-    );
+      http_host_beginning_bytes[5] == http_fragment[i+5];
     if is_match {
       host_begin_i = i + http_host_beginning_bytes.len();
     }
   }
 
   for i in host_begin_i..http_fragment.len() {
-    let is_match = (
+    let is_match =
       http_host_ending_bytes[0] == http_fragment[i+0] &&
-      http_host_ending_bytes[1] == http_fragment[i+1]
-    );
+      http_host_ending_bytes[1] == http_fragment[i+1];
     if is_match {
       host_end_i = i;
     }

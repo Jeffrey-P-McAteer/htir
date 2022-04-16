@@ -10,6 +10,10 @@ pub struct Config {
   pub server_listen_ip: IpAddr,
   pub server_listen_port: u16,
 
+  pub server_ssl_cert: (),
+  pub server_ssl_pkey: (),
+
+
 }
 
 impl Default for Config {
@@ -18,6 +22,8 @@ impl Default for Config {
       //server_listen_ip: IpAddr::V4( Ipv4Addr::new(0, 0, 0, 0) ),
       server_listen_ip: IpAddr::V6( Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 0) ), // Pretty much all OSes give us 0.0.0.0 ipv4 as well when ::/0 is specified.
       server_listen_port: 4430,
+      server_ssl_cert: (),
+      server_ssl_pkey: (),
     }
   }
 }
@@ -27,7 +33,7 @@ pub fn read_config<'a, P: Into<PathBuf>>(override_config_file: Option<P>) -> Con
     match read_config_from_file( override_config_file.into().as_path() ) {
       Ok(c) => return c,
       Err(e) => {
-        eprintln!("read_config_or_default read_config_from_file e={:?}", e);
+        eprintln!("read_config read_config_from_file e={:?}", e);
         return Config::default();
       }
     }

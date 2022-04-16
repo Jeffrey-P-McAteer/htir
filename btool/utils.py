@@ -101,6 +101,24 @@ def get_first_existing(*files):
       return f
   return None
 
+def get_most_recent_mtimed(*files):
+  
+  if len(files) < 1:
+    return None
+
+  file_mtime_dict = {}
+  for f in list(files):
+    if os.path.exists(f):
+      file_mtime_dict[f] = os.path.getmtime(f)
+  
+  most_recent_f = files[0]
+  for f in list(files):
+    if f in file_mtime_dict:
+      if file_mtime_dict[f] > file_mtime_dict[most_recent_f]:
+        most_recent_f = f
+
+  return most_recent_f
+
 # Thanks https://stackoverflow.com/a/1392549/9252743
 def directory_size_bytes(directory):
   total_size = 0

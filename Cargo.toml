@@ -16,11 +16,11 @@ name = "htir"
 path = "src/lib.rs"
 
 [[bin]]
-name = "server"
+name = "htir-server"
 path = "src/server.rs"
 
 [[bin]]
-name = "client"
+name = "htir-client"
 path = "src/client.rs"
 
 

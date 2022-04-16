@@ -30,12 +30,12 @@ def build_all():
 
 def print_linux_exe_locations():
   linux_client_exe = utils.get_first_existing(
-    os.path.join('target', 'x86_64-unknown-linux-gnu', 'release', 'client'),
-    os.path.join('target', 'aarch64-unknown-linux-gnu', 'release', 'client'),
+    os.path.join('target', 'x86_64-unknown-linux-gnu', 'release', 'htir-client'),
+    os.path.join('target', 'aarch64-unknown-linux-gnu', 'release', 'htir-client'),
   )
   linux_server_exe = utils.get_first_existing(
-    os.path.join('target', 'x86_64-unknown-linux-gnu', 'release', 'server'),
-    os.path.join('target', 'aarch64-unknown-linux-gnu', 'release', 'server'),
+    os.path.join('target', 'x86_64-unknown-linux-gnu', 'release', 'htir-server'),
+    os.path.join('target', 'aarch64-unknown-linux-gnu', 'release', 'htir-server'),
   )
 
   if linux_client_exe:
@@ -47,14 +47,14 @@ def print_linux_exe_locations():
 
 def print_windows_exe_locations():
   windows_client_exe = utils.get_first_existing(
-    os.path.join('target', 'x86_64-pc-windows-gnu', 'release', 'client.exe'),
-    os.path.join('target', 'x86_64-pc-windows-msvc', 'release', 'client.exe'),
-    os.path.join('target', 'aarch64-pc-windows-msvc', 'release', 'client.exe'),
+    os.path.join('target', 'x86_64-pc-windows-gnu', 'release', 'htir-client.exe'),
+    os.path.join('target', 'x86_64-pc-windows-msvc', 'release', 'htir-client.exe'),
+    os.path.join('target', 'aarch64-pc-windows-msvc', 'release', 'htir-client.exe'),
   )
   windows_server_exe = utils.get_first_existing(
-    os.path.join('target', 'x86_64-pc-windows-gnu', 'release', 'server.exe'),
-    os.path.join('target', 'x86_64-pc-windows-msvc', 'release', 'server.exe'),
-    os.path.join('target', 'aarch64-pc-windows-msvc', 'release', 'server.exe'),
+    os.path.join('target', 'x86_64-pc-windows-gnu', 'release', 'htir-server.exe'),
+    os.path.join('target', 'x86_64-pc-windows-msvc', 'release', 'htir-server.exe'),
+    os.path.join('target', 'aarch64-pc-windows-msvc', 'release', 'htir-server.exe'),
   )
 
   if windows_client_exe:
@@ -65,12 +65,12 @@ def print_windows_exe_locations():
 
 def print_macos_exe_locations():
   macos_client_exe = utils.get_first_existing(
-    os.path.join('target', 'x86_64-apple-darwin', 'release', 'client'),
-    os.path.join('target', 'aarch64-apple-darwin', 'release', 'client'),
+    os.path.join('target', 'x86_64-apple-darwin', 'release', 'htir-client'),
+    os.path.join('target', 'aarch64-apple-darwin', 'release', 'htir-client'),
   )
   macos_server_exe = utils.get_first_existing(
-    os.path.join('target', 'x86_64-apple-darwin', 'release', 'server'),
-    os.path.join('target', 'aarch64-apple-darwin', 'release', 'server'),
+    os.path.join('target', 'x86_64-apple-darwin', 'release', 'htir-server'),
+    os.path.join('target', 'aarch64-apple-darwin', 'release', 'htir-server'),
   )
 
   if macos_client_exe:
@@ -81,7 +81,10 @@ def print_macos_exe_locations():
     
 
 def build_macos_app_bundle():
-  client_exe = os.path.abspath( os.path.join( 'target', 'x86_64-apple-darwin', 'release', 'client' ) )
+  client_exe = utils.get_most_recent_mtimed(
+    os.path.abspath( os.path.join( 'target', 'x86_64-apple-darwin', 'release', 'htir-client' ) ),
+    os.path.abspath( os.path.join( 'target', 'aarch64-apple-darwin', 'release', 'htir-client' ) ),
+  )
 
   # use client_exe to create target/HTIR.app, a directory
   # conforming to apple's app setup.

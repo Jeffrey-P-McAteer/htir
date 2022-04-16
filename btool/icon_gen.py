@@ -32,7 +32,7 @@ def gen_icons(pov_scene_file, icon_sizes=None, display_cmd=None):
   icnsutil = utils.import_maybe_installing_with_pip('icnsutil')
   PIL = utils.import_maybe_installing_with_pip('PIL', pkg_name='Pillow')
   povray_bin_name = 'povray'
-  if os.name == 'nt': # if is windows host
+  if utils.is_windows_host():
     povray_bin_name = 'pvengine'
     
   for req_bin in [povray_bin_name, 'magick']:
@@ -56,6 +56,7 @@ def gen_icons(pov_scene_file, icon_sizes=None, display_cmd=None):
         # https://www.mankier.com/1/povray
         cmd = [
           shutil.which(povray_bin_name),
+          *(['/EXIT', '/RENDER'] if utils.is_windows_host() else []), # windows used pvengine like an idiot which requires hand-holding: https://stackoverflow.com/a/2207533/9252743
           pov_scene_file,
           'DECLARE=SL_r={}'.format(scene_light), # used in the .pov scene to render different chunks which are merged into final icon image
           'DECLARE=SL_g={}'.format(scene_light),
