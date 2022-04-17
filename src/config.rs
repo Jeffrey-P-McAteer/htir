@@ -8,7 +8,7 @@ use tokio_rustls::rustls::{Certificate, PrivateKey};
 
 use clap;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Config {
   pub server_listen_ip: IpAddr,
   pub server_listen_port: u16,
@@ -16,9 +16,12 @@ pub struct Config {
   pub server_ssl_cert_file: PathBuf,
   pub server_ssl_key_file: PathBuf,
 
-  // Everything below is set from the above using 
+  // Everything below is set from the above using Config::enrich
 
+  #[serde(skip)]
   pub server_ssl_certs: Vec<Certificate>,
+
+  #[serde(skip)]
   pub server_ssl_pkey: (),
 
 
@@ -62,37 +65,12 @@ pub fn read_config<'a, P: Into<PathBuf>>(override_config_file: Option<P>) -> Con
   return Config::default()
 }
 
-pub fn read_config_from_file(file: &Path) -> Result<Config, Box<dyn std::error::Error>> {
-  let mut config = Config::default();
-  
-  //let parser = libucl::Parser::new();
-  let parser = libucl::Parser::with_flags(libucl::parser::Flags::LOWERCASE);
+pub fn read_config_from_file(file: &Path) -> Result<Config, Box<dyn std::error::Error>> {  
   let file_contents = std::fs::read_to_string(file)?;
-  let c = parser.parse(file_contents)?;
-
-  match try_key_val_into(&c, "server_listen_ip") {
-    Ok(Some(parsed_val)) => {
-      config.server_listen_ip = parsed_val;
-    },
-    Ok(None) => {},
-    Err(e) => {
-      eprintln!("Error parsing 'server_listen_ip' {}", e);
-    }
-  }
-
-  match try_key_val_into(&c, "server_listen_port") {
-    Ok(Some(parsed_val)) => {
-      config.server_listen_port = parsed_val;
-    },
-    Ok(None) => {},
-    Err(e) => {
-      eprintln!("Error parsing 'server_listen_port' {}", e);
-    }
-  }
-
-  Ok(config)
+  Ok( toml::from_str(&file_contents)? )
 }
 
+/*
 fn try_key_val_into<T: FromStr + Any + 'static, U: AsRef<str>>(
   obj: &libucl::Object,
   key: U) -> Result<Option<T>, <T as FromStr>::Err >
@@ -173,6 +151,7 @@ fn try_key_val_into<T: FromStr + Any + 'static, U: AsRef<str>>(
   }
   return Ok(None);
 }
+*/
 
 
 //////// Client-supporting config

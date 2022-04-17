@@ -30,7 +30,7 @@ sqlite = "0.26"
 
 dirs = "4.0"
 clap = { version = "3.1", features = ["derive"] }
-libucl = "0.2"
+
 
 futures-util = { version = "0.3" } #, default-features = false, features = ["sink", "std"] }
 tokio-tungstenite = "*"
@@ -41,6 +41,8 @@ rustls-pemfile = "0.2"
 serde = { version = "1", features = ["derive"] }
 serde_bare = "0.5.0"
 serde_bytes = "0.11"
+
+toml = "0.5"
 
 ciborium = "0.2.0"
 
