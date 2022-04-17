@@ -13,7 +13,7 @@ pub fn open_gui(_args: &Args) -> Result<(), Box<dyn std::error::Error>> {
   let app = App::new("com.hello.world", BasicApp::default());
   
   App::set_menu(vec![
-    Menu::new("HTIR", vec![
+    Menu::new("Meili", vec![
       MenuItem::new("Hello World Menu Item").action(|| {
         println!("Hello World Menu Item clicked!");
         
@@ -71,17 +71,17 @@ impl Default for BasicApp {
 impl Default for BasicWindow {
   fn default() -> Self {
     BasicWindow {
-      toolbar: Toolbar::new("HTIR-Toolbar", BasicToolbar::default()),
+      toolbar: Toolbar::new("Meili-Toolbar", BasicToolbar::default()),
     }
   }
 }
 
 impl WindowDelegate for BasicWindow {
-    const NAME: &'static str = "HTIR-Client-WindowDelegate";
+    const NAME: &'static str = "Meili-Client-WindowDelegate";
 
     fn did_load(&mut self, window: Window) {
         window.set_minimum_content_size(400.0, 300.0);
-        window.set_title("HTIR Client");
+        window.set_title("Meili Client");
         window.set_movable_by_background(true);
         window.set_titlebar_appears_transparent(false);
         window.set_toolbar(&self.toolbar);
@@ -103,7 +103,7 @@ impl AppDelegate for BasicApp {
     /*fn dock_menu(&self) -> Option<Menu> {
       println!("BasicApp.dock_menu()");
 
-      let m = Menu::new("HTIR", vec![
+      let m = Menu::new("Meili", vec![
         MenuItem::new("Hello World Menu Item").action(|| {
           println!("Hello World Menu Item clicked!");
         }),
@@ -138,7 +138,7 @@ impl Default for BasicToolbar {
 }
 
 impl ToolbarDelegate for BasicToolbar {
-  const NAME: &'static str = "HTIRClientToolbar";
+  const NAME: &'static str = "MeiliClientToolbar";
 
   fn did_load(&mut self, toolbar: Toolbar) {
       toolbar.set_display_mode(ToolbarDisplayMode::IconOnly);

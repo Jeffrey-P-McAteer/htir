@@ -1,6 +1,6 @@
 
 /**
- * All per-OS GUI implementations use the htir lib to perform operations
+ * All per-OS GUI implementations use the meili lib to perform operations
  * and declare the same public API, this module merely renames them so
  * client code does not have to care what the backend GUI target is.
  * OS-specific things may be wrapped in `Option<>` types, and all `Result<>` types will

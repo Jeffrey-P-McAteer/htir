@@ -13,21 +13,21 @@ def main(args=sys.argv):
   btool.main(args)
 
   linux_release_files = [
-    ( os.path.abspath(os.path.join('target', 'x86_64-unknown-linux-gnu', 'release', 'htir-client')), 'linux-x86_64-client'),
-    ( os.path.abspath(os.path.join('target', 'x86_64-unknown-linux-gnu', 'release', 'htir-server')), 'linux-x86_64-server'),
+    ( os.path.abspath(os.path.join('target', 'x86_64-unknown-linux-gnu', 'release', 'meili-client')), 'linux-x86_64-meili-client'),
+    ( os.path.abspath(os.path.join('target', 'x86_64-unknown-linux-gnu', 'release', 'meili-server')), 'linux-x86_64-meili-server'),
     # Todo aarch64 names
   ]
 
   windows_release_files = [
-    ( os.path.abspath(os.path.join('target', 'x86_64-pc-windows-gnu', 'release', 'htir-client.exe')), 'windows-x86_64-client.exe'),
-    ( os.path.abspath(os.path.join('target', 'x86_64-pc-windows-gnu', 'release', 'htir-server.exe')), 'windows-x86_64-server.exe' ),
+    ( os.path.abspath(os.path.join('target', 'x86_64-pc-windows-gnu', 'release', 'meili-client.exe')), 'windows-x86_64-meili-client.exe'),
+    ( os.path.abspath(os.path.join('target', 'x86_64-pc-windows-gnu', 'release', 'meili-server.exe')), 'windows-x86_64-meili-server.exe' ),
     # Todo aarch64 names
   ]
 
   macos_release_files = [
-    ( os.path.abspath(os.path.join('target', 'HTIR.dmg')), 'macos-HTIR.dmg'),
-    ( os.path.abspath(os.path.join('target', 'x86_64-apple-darwin', 'release', 'htir-client')), 'macos-x86_64-client'),
-    ( os.path.abspath(os.path.join('target', 'x86_64-apple-darwin', 'release', 'htir-server')), 'macos-x86_64-server'),
+    ( os.path.abspath(os.path.join('target', 'Meili.dmg')), 'macos-Meili.dmg'),
+    ( os.path.abspath(os.path.join('target', 'x86_64-apple-darwin', 'release', 'meili-client')), 'macos-x86_64-meili-client'),
+    ( os.path.abspath(os.path.join('target', 'x86_64-apple-darwin', 'release', 'meili-server')), 'macos-x86_64-meili-server'),
     # Todo aarch64 names
   ]
 
@@ -74,7 +74,7 @@ def main(args=sys.argv):
     print('> {}'.format(os.path.basename(f)))
 
   github_binary_upload.publish_release_from_tag(
-    '{}/htir'.format(github_username), None, assets_to_upload, 'github.com', github_username, github_access_token, False
+    '{}/meili'.format(github_username), None, assets_to_upload, 'github.com', github_username, github_access_token, False
   )
 
   

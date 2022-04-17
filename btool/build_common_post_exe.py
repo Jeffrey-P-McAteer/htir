@@ -30,12 +30,12 @@ def build_all():
 
 def print_linux_exe_locations():
   linux_client_exe = utils.get_first_existing(
-    os.path.join('target', 'x86_64-unknown-linux-gnu', 'release', 'htir-client'),
-    os.path.join('target', 'aarch64-unknown-linux-gnu', 'release', 'htir-client'),
+    os.path.join('target', 'x86_64-unknown-linux-gnu', 'release', 'meili-client'),
+    os.path.join('target', 'aarch64-unknown-linux-gnu', 'release', 'meili-client'),
   )
   linux_server_exe = utils.get_first_existing(
-    os.path.join('target', 'x86_64-unknown-linux-gnu', 'release', 'htir-server'),
-    os.path.join('target', 'aarch64-unknown-linux-gnu', 'release', 'htir-server'),
+    os.path.join('target', 'x86_64-unknown-linux-gnu', 'release', 'meili-server'),
+    os.path.join('target', 'aarch64-unknown-linux-gnu', 'release', 'meili-server'),
   )
 
   if linux_client_exe:
@@ -47,14 +47,14 @@ def print_linux_exe_locations():
 
 def print_windows_exe_locations():
   windows_client_exe = utils.get_first_existing(
-    os.path.join('target', 'x86_64-pc-windows-gnu', 'release', 'htir-client.exe'),
-    os.path.join('target', 'x86_64-pc-windows-msvc', 'release', 'htir-client.exe'),
-    os.path.join('target', 'aarch64-pc-windows-msvc', 'release', 'htir-client.exe'),
+    os.path.join('target', 'x86_64-pc-windows-gnu', 'release', 'meili-client.exe'),
+    os.path.join('target', 'x86_64-pc-windows-msvc', 'release', 'meili-client.exe'),
+    os.path.join('target', 'aarch64-pc-windows-msvc', 'release', 'meili-client.exe'),
   )
   windows_server_exe = utils.get_first_existing(
-    os.path.join('target', 'x86_64-pc-windows-gnu', 'release', 'htir-server.exe'),
-    os.path.join('target', 'x86_64-pc-windows-msvc', 'release', 'htir-server.exe'),
-    os.path.join('target', 'aarch64-pc-windows-msvc', 'release', 'htir-server.exe'),
+    os.path.join('target', 'x86_64-pc-windows-gnu', 'release', 'meili-server.exe'),
+    os.path.join('target', 'x86_64-pc-windows-msvc', 'release', 'meili-server.exe'),
+    os.path.join('target', 'aarch64-pc-windows-msvc', 'release', 'meili-server.exe'),
   )
 
   if windows_client_exe:
@@ -65,12 +65,12 @@ def print_windows_exe_locations():
 
 def print_macos_exe_locations():
   macos_client_exe = utils.get_first_existing(
-    os.path.join('target', 'x86_64-apple-darwin', 'release', 'htir-client'),
-    os.path.join('target', 'aarch64-apple-darwin', 'release', 'htir-client'),
+    os.path.join('target', 'x86_64-apple-darwin', 'release', 'meili-client'),
+    os.path.join('target', 'aarch64-apple-darwin', 'release', 'meili-client'),
   )
   macos_server_exe = utils.get_first_existing(
-    os.path.join('target', 'x86_64-apple-darwin', 'release', 'htir-server'),
-    os.path.join('target', 'aarch64-apple-darwin', 'release', 'htir-server'),
+    os.path.join('target', 'x86_64-apple-darwin', 'release', 'meili-server'),
+    os.path.join('target', 'aarch64-apple-darwin', 'release', 'meili-server'),
   )
 
   if macos_client_exe:
@@ -82,19 +82,19 @@ def print_macos_exe_locations():
 
 def build_macos_app_bundle():
   client_exe = utils.get_most_recent_mtimed(
-    os.path.abspath( os.path.join( 'target', 'x86_64-apple-darwin', 'release', 'htir-client' ) ),
-    os.path.abspath( os.path.join( 'target', 'aarch64-apple-darwin', 'release', 'htir-client' ) ),
+    os.path.abspath( os.path.join( 'target', 'x86_64-apple-darwin', 'release', 'meili-client' ) ),
+    os.path.abspath( os.path.join( 'target', 'aarch64-apple-darwin', 'release', 'meili-client' ) ),
   )
 
-  # use client_exe to create target/HTIR.app, a directory
+  # use client_exe to create target/Meili.app, a directory
   # conforming to apple's app setup.
-  HTIR_app = os.path.abspath( os.path.join('target', 'HTIR.app') )
-  os.makedirs(HTIR_app, exist_ok=True)
-  os.makedirs(os.path.join(HTIR_app, 'Contents', 'Resources'), exist_ok=True)
+  Meili_app = os.path.abspath( os.path.join('target', 'Meili.app') )
+  os.makedirs(Meili_app, exist_ok=True)
+  os.makedirs(os.path.join(Meili_app, 'Contents', 'Resources'), exist_ok=True)
   
   files_to_copy = [
-    (client_exe, os.path.join(HTIR_app, 'HTIR')),
-    (os.path.join('target', 'HTIR.icns'), os.path.join(HTIR_app, 'Contents', 'Resources', 'AppIcon.icns')),
+    (client_exe, os.path.join(Meili_app, 'Meili')),
+    (os.path.join('target', 'Meili.icns'), os.path.join(Meili_app, 'Contents', 'Resources', 'AppIcon.icns')),
   ]
   for src_f, dst_f in files_to_copy:
     try:
@@ -106,31 +106,31 @@ def build_macos_app_bundle():
   #plistlib = utils.import_maybe_installing_with_pip('plistlib') # python SHIPS with this! Woah.
 
   plist_data = dict(
-    CFBundleDisplayName='HTIR',
-    CFBundleName='HTIR',
-    CFBundleExecutable=os.path.join('HTIR'),
+    CFBundleDisplayName='Meili',
+    CFBundleName='Meili',
+    CFBundleExecutable=os.path.join('Meili'),
     CFBundleIconFile=os.path.join('Contents', 'Resources', 'AppIcon.icns'), # Legacy apparently?
     #CFBundleIconName='', # TODO research asset catalog & use this; potential light + dark-mode icons?
-    CFBundleIdentifier='pw.jmcateer.htir-client',
+    CFBundleIdentifier='pw.jmcateer.meili-client',
     NSHighResolutionCapable=True,
   )
 
-  with open(os.path.join(HTIR_app, 'Contents', 'Info.plist'), 'wb') as fd:
+  with open(os.path.join(Meili_app, 'Contents', 'Info.plist'), 'wb') as fd:
     plistlib.dump(plist_data, fd)
 
 
-  print('MacOS HTIR Client .app created at {}'.format(HTIR_app))
+  print('MacOS Meili Client .app created at {}'.format(Meili_app))
 
 
   # Now put .app in .dmg w/ background image!
   if shutil.which('mkfs.hfsplus'):
-    dmg_image_size_bytes = utils.directory_size_bytes(HTIR_app)
+    dmg_image_size_bytes = utils.directory_size_bytes(Meili_app)
     dmg_image_size_bytes *= 1.35 # assume hfs+ needs 35% overhead for bookkeeping
 
     dmg_image_size_mbytes = int(dmg_image_size_bytes / 1000000)
 
-    dmg_file = os.path.abspath(os.path.join('target', 'HTIR.dmg'))
-    dmg_mountpoint = os.path.abspath(os.path.join('target', 'HTIR.dmg_mount'))
+    dmg_file = os.path.abspath(os.path.join('target', 'Meili.dmg'))
+    dmg_mountpoint = os.path.abspath(os.path.join('target', 'Meili.dmg_mount'))
 
     if os.path.exists(dmg_mountpoint):
       subprocess.run(['sudo', 'umount', dmg_mountpoint], check=False) # not fatal if process dies, we just need to try before removing .dmg file
@@ -140,12 +140,12 @@ def build_macos_app_bundle():
       os.remove(dmg_file)
 
     utils.run_silent_cmd('dd', 'if=/dev/zero', 'of={}'.format(dmg_file), 'bs=1M', 'count={}'.format(dmg_image_size_mbytes))
-    utils.run_silent_cmd('mkfs.hfsplus', '-v', 'InstallHTIR', '-M', '777', dmg_file)
+    utils.run_silent_cmd('mkfs.hfsplus', '-v', 'InstallMeili', '-M', '777', dmg_file)
 
     utils.run_silent_cmd('sudo', 'mount', '-o', 'loop', dmg_file, dmg_mountpoint)
 
     # Begin adding to .dmg
-    shutil.copytree(HTIR_app, os.path.join(dmg_mountpoint, os.path.basename(HTIR_app)))
+    shutil.copytree(Meili_app, os.path.join(dmg_mountpoint, os.path.basename(Meili_app)))
 
     #spotlight_vol_plist = os.path.join(dmg_mountpoint, '.Spotlight-V100', 'VolumeConfiguration.plist')
     #os.makedirs(os.path.dirname(spotlight_vol_plist), exist_ok=True)
@@ -160,27 +160,27 @@ def build_macos_app_bundle():
     subprocess.run(['sudo', 'umount', dmg_mountpoint], check=False)
     os.rmdir(dmg_mountpoint)
 
-    print('MacOS HTIR Client .dmg created at {}'.format(dmg_file))
+    print('MacOS Meili Client .dmg created at {}'.format(dmg_file))
 
 
   elif shutil.which('hdiutil'):
-    dmg_file = os.path.abspath(os.path.join('target', 'HTIR.dmg'))
-    dmg_mountpoint = os.path.abspath(os.path.join('target', 'HTIR.dmg_mount'))
+    dmg_file = os.path.abspath(os.path.join('target', 'Meili.dmg'))
+    dmg_mountpoint = os.path.abspath(os.path.join('target', 'Meili.dmg_mount'))
     if os.path.exists(dmg_mountpoint):
       shutil.rmtree(dmg_mountpoint)
     os.makedirs(dmg_mountpoint, exist_ok=True)
 
     # Begin adding to .dmg
-    shutil.copytree(HTIR_app, os.path.join(dmg_mountpoint, os.path.basename(HTIR_app)))
-    # .dmg contains ./HTIR.app, anything else?
+    shutil.copytree(Meili_app, os.path.join(dmg_mountpoint, os.path.basename(Meili_app)))
+    # .dmg contains ./Meili.app, anything else?
 
     # End adding to .dmg
 
     utils.run_silent_cmd(
-      'hdiutil', 'create', '-volname', 'InstallHTIR', '-srcfolder', dmg_mountpoint, '-ov', '-format', 'UDZO', dmg_file
+      'hdiutil', 'create', '-volname', 'InstallMeili', '-srcfolder', dmg_mountpoint, '-ov', '-format', 'UDZO', dmg_file
     )
 
-    print('MacOS HTIR Client .dmg created at {}'.format(dmg_file))
+    print('MacOS Meili Client .dmg created at {}'.format(dmg_file))
 
 
 

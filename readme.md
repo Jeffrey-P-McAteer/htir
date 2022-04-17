@@ -1,4 +1,19 @@
-# Highly-Typed Information Registry (HTIR)
+# Meili: the Highly-Typed Information Registry (HTIR)
+
+## Name Etymology
+
+```
+Meili is one of the Æsir in Norse mythology.
+His name appears to mean "mile-stepper", and if accurate,
+could mean that he was a Norse god of travel.
+Given the importance of travel in Norse culture,
+Meili would then have been an important figure in the Norse pantheon,
+but no first-hand accounts of his status are known to exist,
+so his rank and function among the Æsir remains a point of conjecture.
+```
+(https://mythology.wikia.org/wiki/Meili)
+
+## Project
 
 This repository holds
 
@@ -50,9 +65,14 @@ Benefits which _could_ be designed in but are explicitly _not_:
 
 # Goals
 
- - [ ] Async by default (try to use all HW cores available in server, single-thread in client)
- - [ ] Use libucl for server & client configuration: https://docs.rs/libucl/latest/libucl/
- - [ ] Client GUIs for windows, macos, linux, and the BSDs
+ - [X] Async by default (try to use all HW cores available in server, single-thread in client)
+ - [X] Use libucl for server & client configuration: https://docs.rs/libucl/latest/libucl/
+ - [X] Client GUIs for windows, macos, linux, and the BSDs
+ - [ ] Client -> Server comms
+ - [ ] Server -> DB queries
+ - [ ] Server -> shared library function call w/ some configurable caching
+ - [ ] Server -> Server federation
+ - [ ] Client -> local app integrations so the DB layer can be used to pass execution state around machines within the same trust
 
 
 # Design
@@ -166,9 +186,9 @@ python -m btool
 
 python -m btool.release
 
-python -m btool.testcmd ./target/x86_64-unknown-linux-gnu/release/htir-server
+python -m btool.testcmd ./target/x86_64-unknown-linux-gnu/release/meili-server
 
-python -m btool.testcmd ./target/x86_64-unknown-linux-gnu/release/htir-client
+python -m btool.testcmd ./target/x86_64-unknown-linux-gnu/release/meili-client
 
 
 ```

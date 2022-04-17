@@ -20,7 +20,7 @@ def build_all():
   create_cargo_config_if_necessary()
   
   # Uses a 3rd-party renderer & python code to render high-quality .png and generate a .icns file under ./target/
-  icon_gen.gen_icons(os.path.abspath(os.path.join('htir_app_icon.pov')))
+  icon_gen.gen_icons(os.path.abspath(os.path.join('meili_app_icon.pov')))
 
 
 

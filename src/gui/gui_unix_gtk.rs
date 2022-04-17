@@ -7,13 +7,13 @@ use glib;
 
 pub fn open_gui(_args: &Args) -> Result<(), Box<dyn std::error::Error>> {
   let application = Application::builder()
-      .application_id("pw.jmcateer.htir-client")
+      .application_id("pw.jmcateer.meili-client")
       .build();
 
   application.connect_activate(|app| {
       let window = ApplicationWindow::builder()
           .application(app)
-          .title("HTIR Client")
+          .title("Meili Client")
           .decorated(true) // TODO use user preference?
           .default_width(400)
           .default_height(300)

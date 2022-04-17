@@ -119,7 +119,7 @@ difference {
     }
   }
   text {
-    ttf "crystal.ttf" "HTIR" 11, -0.3
+    ttf "crystal.ttf" "Meili" 11, -0.3
     pigment { color <0.1,0.1,0.1>  }
     finish { reflection .25 specular 1 }
     translate <-0.5, 0.0, 0.0>

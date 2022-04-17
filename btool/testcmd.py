@@ -80,7 +80,7 @@ def main(args=sys.argv):
   build_common_pre_exe.build_all()
 
   # Additional arguments will be executed, waited on, and killed/re-executed when src changes.
-  # build_common_pre_exe WILL NOT be re-run between source changes, only htir itself will be re-built.
+  # build_common_pre_exe WILL NOT be re-run between source changes, only Meili itself will be re-built.
   test_cmd = sys.argv[1:]
 
   src_dir = os.path.abspath(os.path.join('src'))

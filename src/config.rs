@@ -1,16 +1,24 @@
 
 use std::path::{Path, PathBuf};
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+use std::str::FromStr;
+use std::any::{Any, TypeId};
 
-use clap::Parser;
+use tokio_rustls::rustls::{Certificate, PrivateKey};
 
+use clap;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone)]
 pub struct Config {
   pub server_listen_ip: IpAddr,
   pub server_listen_port: u16,
 
-  pub server_ssl_cert: (),
+  pub server_ssl_cert_file: PathBuf,
+  pub server_ssl_key_file: PathBuf,
+
+  // Everything below is set from the above using 
+
+  pub server_ssl_certs: Vec<Certificate>,
   pub server_ssl_pkey: (),
 
 
@@ -22,18 +30,31 @@ impl Default for Config {
       //server_listen_ip: IpAddr::V4( Ipv4Addr::new(0, 0, 0, 0) ),
       server_listen_ip: IpAddr::V6( Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 0) ), // Pretty much all OSes give us 0.0.0.0 ipv4 as well when ::/0 is specified.
       server_listen_port: 4430,
-      server_ssl_cert: (),
+      server_ssl_cert_file: PathBuf::from("/dev/null"),
+      server_ssl_key_file: PathBuf::from("/dev/null"),
+      server_ssl_certs: vec![],
       server_ssl_pkey: (),
     }
   }
 }
 
+impl Config {
+  // Responsible for using config values to generate the lower config fields which
+  // may not make sense to "parse" because they rely on multiple upper fields agreeing on something.
+  pub fn enrich(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+    
+    Ok(())
+  }
+}
+
 pub fn read_config<'a, P: Into<PathBuf>>(override_config_file: Option<P>) -> Config {
   if let Some(override_config_file) = override_config_file {
-    match read_config_from_file( override_config_file.into().as_path() ) {
+    let config_file_path = override_config_file.into();
+    let config_file_path = config_file_path.as_path();
+    match read_config_from_file( config_file_path ) {
       Ok(c) => return c,
       Err(e) => {
-        eprintln!("read_config read_config_from_file e={:?}", e);
+        eprintln!("Error reading config from {}: {:?}", config_file_path.display(), e);
         return Config::default();
       }
     }
@@ -41,16 +62,122 @@ pub fn read_config<'a, P: Into<PathBuf>>(override_config_file: Option<P>) -> Con
   return Config::default()
 }
 
-pub fn read_config_from_file(_file: &Path) -> Result<Config, Box<dyn std::error::Error>> {
-  std::unimplemented!()
+pub fn read_config_from_file(file: &Path) -> Result<Config, Box<dyn std::error::Error>> {
+  let mut config = Config::default();
+  
+  //let parser = libucl::Parser::new();
+  let parser = libucl::Parser::with_flags(libucl::parser::Flags::LOWERCASE);
+  let file_contents = std::fs::read_to_string(file)?;
+  let c = parser.parse(file_contents)?;
+
+  match try_key_val_into(&c, "server_listen_ip") {
+    Ok(Some(parsed_val)) => {
+      config.server_listen_ip = parsed_val;
+    },
+    Ok(None) => {},
+    Err(e) => {
+      eprintln!("Error parsing 'server_listen_ip' {}", e);
+    }
+  }
+
+  match try_key_val_into(&c, "server_listen_port") {
+    Ok(Some(parsed_val)) => {
+      config.server_listen_port = parsed_val;
+    },
+    Ok(None) => {},
+    Err(e) => {
+      eprintln!("Error parsing 'server_listen_port' {}", e);
+    }
+  }
+
+  Ok(config)
 }
 
-
+fn try_key_val_into<T: FromStr + Any + 'static, U: AsRef<str>>(
+  obj: &libucl::Object,
+  key: U) -> Result<Option<T>, <T as FromStr>::Err >
+  where <T as FromStr>::Err: std::error::Error
+{
+  let key = key.as_ref();
+  if key.contains(".") {
+    let obj = obj.fetch_path(key);
+    if let Some(obj) = obj {
+      // We have a value, go into parsing mode!
+      if TypeId::of::<T>() == TypeId::of::<u16>() || TypeId::of::<T>() == TypeId::of::<i16>() ||
+         TypeId::of::<T>() == TypeId::of::<u32>() || TypeId::of::<T>() == TypeId::of::<i32>() ||
+         TypeId::of::<T>() == TypeId::of::<u64>() || TypeId::of::<T>() == TypeId::of::<i64>() ||
+         TypeId::of::<T>() == TypeId::of::<usize>() || TypeId::of::<T>() == TypeId::of::<isize>()
+      {
+        if let Some(obj_int) = obj.as_int() { // try as i64
+          //... turn it back into a string so we rely on the FromStr::parse::<T> for &str -> T
+          let obj_s = format!("{}", obj_int);
+          match obj_s.parse::<T>() {
+            Ok(val) => {
+              return Ok(Some( val ));
+            }
+            Err(e) => {
+              return Err(e);
+            }
+          }
+        }
+      }
+      else {
+        if let Some(obj_s) = obj.as_string() { // try as a string
+          match obj_s.parse::<T>() {
+            Ok(val) => {
+              return Ok(Some( val ));
+            }
+            Err(e) => {
+              return Err(e);
+            }
+          }
+        }
+      }
+    }
+  }
+  else {
+    let obj = obj.fetch(key);
+    if let Some(obj) = obj {
+      // We have a value, go into parsing mode!
+      if TypeId::of::<T>() == TypeId::of::<u16>() || TypeId::of::<T>() == TypeId::of::<i16>() ||
+         TypeId::of::<T>() == TypeId::of::<u32>() || TypeId::of::<T>() == TypeId::of::<i32>() ||
+         TypeId::of::<T>() == TypeId::of::<u64>() || TypeId::of::<T>() == TypeId::of::<i64>() ||
+         TypeId::of::<T>() == TypeId::of::<usize>() || TypeId::of::<T>() == TypeId::of::<isize>()
+      {
+        if let Some(obj_int) = obj.as_int() { // try as i64
+          //... turn it back into a string so we rely on the FromStr::parse::<T> for &str -> T
+          let obj_s = format!("{}", obj_int);
+          match obj_s.parse::<T>() {
+            Ok(val) => {
+              return Ok(Some( val ));
+            }
+            Err(e) => {
+              return Err(e);
+            }
+          }
+        }
+      }
+      else {
+        if let Some(obj_s) = obj.as_string() { // try as a string
+          match obj_s.parse::<T>() {
+            Ok(val) => {
+              return Ok(Some( val ));
+            }
+            Err(e) => {
+              return Err(e);
+            }
+          }
+        }
+      }
+    }
+  }
+  return Ok(None);
+}
 
 
 //////// Client-supporting config
 
-#[derive(Parser, Debug, Default)]
+#[derive(clap::Parser, Debug, Default)]
 #[clap(author, version, about, long_about = None)]
 pub struct Args {
   #[clap(short, long)]

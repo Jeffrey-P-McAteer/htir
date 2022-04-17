@@ -21,7 +21,7 @@ def gen_icons(pov_scene_file, icon_sizes=None, display_cmd=None):
     for w,h in sizes:
       yield os.path.abspath(os.path.join('target', '{}x{}{}.png'.format(w,h,suffix) ))
   
-  icon_icns = os.path.abspath(os.path.join('target', 'HTIR.icns'))
+  icon_icns = os.path.abspath(os.path.join('target', 'Meili.icns'))
   if icon_sizes is None:
     icon_sizes = [
       # Ensure we use sizes icnsutil supports: https://github.com/relikd/icnsutil/blob/8243534f650c3b00fd59b141debf92fd30800aa5/icnsutil/IcnsType.py#L118
@@ -129,7 +129,7 @@ def gen_icons(pov_scene_file, icon_sizes=None, display_cmd=None):
     if h > 200 and h < 300 and w > 200 and w < 300:
       best_icon_size = (h, w)
   icon_png = next( icon_pngs([best_icon_size]) )
-  windows_ico_file = os.path.abspath(os.path.join('target', 'HTIR.ico'))
+  windows_ico_file = os.path.abspath(os.path.join('target', 'Meili.ico'))
   if is_source_newer(icon_png, windows_ico_file):
     print('Generating {}'.format(windows_ico_file))
     img = PIL.Image.open(icon_png)

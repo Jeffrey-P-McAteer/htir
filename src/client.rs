@@ -3,8 +3,8 @@ use tokio::runtime::{Builder};
 use clap::Parser;
 
 
-use htir::*;
-use htir::config::Args;
+use meili::*;
+use meili::config::Args;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
   let args = Args::parse();
