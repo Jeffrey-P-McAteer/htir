@@ -1,8 +1,8 @@
 
 use std::path::{Path, PathBuf};
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
-use std::str::FromStr;
-use std::any::{Any, TypeId};
+//use std::str::FromStr;
+//use std::any::{Any, TypeId};
 
 use tokio_rustls::rustls::{Certificate, PrivateKey};
 
@@ -10,11 +10,12 @@ use clap;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct Config {
-  pub server_listen_ip: IpAddr,
-  pub server_listen_port: u16,
+  pub server_listen_ip: IpAddr, // TCP + UDP
+  pub server_listen_port: u16, // TCP + UDP + Multicast groups
+  pub server_multicast_groups: Vec<IpAddr>, // Multiple groups to allow v4 and v6 comms elegantly
 
-  pub server_ssl_cert_file: PathBuf,
-  pub server_ssl_key_file: PathBuf,
+  pub server_ssl_cert_file: Option<PathBuf>,
+  pub server_ssl_key_file: Option<PathBuf>,
 
   // Everything below is set from the above using Config::enrich
 
@@ -22,7 +23,7 @@ pub struct Config {
   pub server_ssl_certs: Vec<Certificate>,
 
   #[serde(skip)]
-  pub server_ssl_pkey: (),
+  pub server_ssl_pkey: Option<PrivateKey>,
 
 
 }
@@ -33,10 +34,11 @@ impl Default for Config {
       //server_listen_ip: IpAddr::V4( Ipv4Addr::new(0, 0, 0, 0) ),
       server_listen_ip: IpAddr::V6( Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 0) ), // Pretty much all OSes give us 0.0.0.0 ipv4 as well when ::/0 is specified.
       server_listen_port: 4430,
-      server_ssl_cert_file: PathBuf::from("/dev/null"),
-      server_ssl_key_file: PathBuf::from("/dev/null"),
+      server_multicast_groups: vec![ IpAddr::V6( Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 0) ), ],
+      server_ssl_cert_file: None,
+      server_ssl_key_file: None,
       server_ssl_certs: vec![],
-      server_ssl_pkey: (),
+      server_ssl_pkey: None,
     }
   }
 }
@@ -48,6 +50,12 @@ impl Config {
     
     Ok(())
   }
+
+  // Accessors which use base data to construct richer types
+  pub fn get_listen_socket(&self) -> std::net::SocketAddr {
+    std::net::SocketAddr::new(self.server_listen_ip, self.server_listen_port)
+  }
+
 }
 
 pub fn read_config<'a, P: Into<PathBuf>>(override_config_file: Option<P>) -> Config {

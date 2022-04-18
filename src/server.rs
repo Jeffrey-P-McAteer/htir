@@ -46,14 +46,14 @@ async fn init_server_config(config: &config::Config) -> Result<(), Box<dyn std::
 
 async fn server_main(config: &config::Config) -> Result<(), Box<dyn std::error::Error>> {
   println!("server_main({:?})", config);
-  let addr = "127.0.0.1:4430"; // TODO read from config
   
   // TODO encrypt server by default
   // TODO if no SSL connection 301 it to https
   // TODO if TCP is BARE packet prefer that
 
-  let listener = TcpListener::bind(&addr).await?;
-  eprintln!("Listening on: {}", addr);
+  let listen_addr = config.get_listen_socket();
+  let listener = TcpListener::bind(&listen_addr).await?;
+  eprintln!("Listening on: {}", listen_addr);
   loop {
     match listener.accept().await {
       Ok((stream, remote_peer_addr)) => {
