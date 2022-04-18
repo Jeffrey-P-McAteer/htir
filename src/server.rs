@@ -8,9 +8,11 @@ use std::sync::Arc;
 use tokio::runtime::{Builder};
 use tokio::net::{TcpListener, TcpStream};
 use tokio::io::{ReadBuf, AsyncWriteExt};
+use tokio::time::timeout;
 
 use futures_util::{future, StreamExt, TryStreamExt};
-use futures_util::future::poll_fn;
+use futures_util::future::{poll_fn, join_all};
+use futures_util::FutureExt;
 
 use tokio_rustls::rustls::{Certificate, PrivateKey};
 use tokio_rustls::TlsAcceptor;
@@ -21,13 +23,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
   let rt = Builder::new_multi_thread()
     //.worker_threads(4) // defaults to HW concurrency numbers reported by the OS / hardware
     .thread_stack_size(3 * 1024 * 1024)
+    .enable_time() // we actually use this one for all our timeouts!
     .enable_all()
     .build()?;
 
   rt.block_on(async {
-    let c = config::read_config::<&str>(None);
-    if let Err(e) = init_server_config(&c).await {
-      eprintln!("Error during init_server_config: {}", e);
+    let mut c = config::read_config::<&str>(None);
+    if let Err(e) = c.enrich_server() {
+      eprintln!("Error during Config::enrich_server: {}", e);
       return;
     }
     if let Err(e) = server_main(&c).await {
@@ -35,43 +38,75 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
   });
 
-  Ok(())
-}
+  rt.shutdown_timeout(std::time::Duration::from_millis(2400));
 
-async fn init_server_config(config: &config::Config) -> Result<(), Box<dyn std::error::Error>> {
-
-  // All checks passed!
   Ok(())
 }
 
 async fn server_main(config: &config::Config) -> Result<(), Box<dyn std::error::Error>> {
   println!("server_main({:?})", config);
   
-  // TODO encrypt server by default
-  // TODO if no SSL connection 301 it to https
-  // TODO if TCP is BARE packet prefer that
+  let mut server_listen_futures: Vec<_> = vec![
+    tcp_server_main_opaque(config).boxed()
+  ];
 
-  let listen_addr = config.get_listen_socket();
-  let listener = TcpListener::bind(&listen_addr).await?;
-  eprintln!("Listening on: {}", listen_addr);
-  loop {
-    match listener.accept().await {
-      Ok((stream, remote_peer_addr)) => {
-        tokio::spawn(async move {
-          if let Err(e) = handle_connection(stream, remote_peer_addr).await {
-            eprintln!("Error during handle_connection() for remote_peer_addr={}: {}", remote_peer_addr, e);
-          }
-        });
-      }
-      Err(e) => {
-        eprintln!("listener.accept().await loop e={:?}", e);
-      }
-    }
+  for group in &config.server_multicast_groups {
+    server_listen_futures.push(
+      udp_server_main_opaque(config, group.clone()).boxed()
+    );
   }
+
+  join_all(server_listen_futures).await; // block on all server functions
+
+
   Ok(())
 }
 
-async fn handle_connection(mut stream: TcpStream, remote_peer_addr: SocketAddr) -> Result<(), Box<dyn std::error::Error>> {
+async fn tcp_server_main_opaque(config: &config::Config) {
+  if let Err(e) = tcp_server_main(config).await {
+    eprintln!("tcp_server_main e={}", e);
+  }
+}
+
+async fn tcp_server_main(config: &config::Config) -> Result<(), Box<dyn std::error::Error>> {
+  let tcp_listen_addr = config.get_tcp_listen_socket();
+  let tcp_listener = TcpListener::bind(&tcp_listen_addr).await?;
+
+  eprintln!("Listening on TCP {}", tcp_listen_addr);
+
+  loop {
+    match timeout(std::time::Duration::from_millis(500), tcp_listener.accept()).await {
+      Ok(Ok((stream, remote_peer_addr))) => {
+        tokio::spawn(async move {
+          if let Err(e) = handle_tcp_connection(stream, remote_peer_addr).await {
+            eprintln!("Error during handle_tcp_connection() for remote_peer_addr={}: {}", remote_peer_addr, e);
+          }
+        });
+      }
+      Ok(Err(e)) => {
+        eprintln!("tcp_listener.accept().await loop e={:?}", e);
+      }
+      Err(_e) => { // Timeouts get ignored
+        //eprintln!("tcp_listener.accept().await loop e={:?}", e);
+      }
+    }
+  }
+
+  //Ok(())
+}
+
+async fn udp_server_main_opaque(config: &config::Config, udp_listen_addr: std::net::IpAddr) {
+  if let Err(e) = udp_server_main(config, udp_listen_addr).await {
+    eprintln!("udp_server_main e={}", e);
+  }
+}
+
+async fn udp_server_main(config: &config::Config, udp_listen_addr: std::net::IpAddr) -> Result<(), Box<dyn std::error::Error>> {
+
+  Ok(())
+}
+
+async fn handle_tcp_connection(mut stream: TcpStream, remote_peer_addr: SocketAddr) -> Result<(), Box<dyn std::error::Error>> {
   eprintln!("TCP client connected: {}", remote_peer_addr);
 
   // Is this a BARE stream or an HTTP stream or an HTTPS stream?

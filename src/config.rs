@@ -46,13 +46,20 @@ impl Default for Config {
 impl Config {
   // Responsible for using config values to generate the lower config fields which
   // may not make sense to "parse" because they rely on multiple upper fields agreeing on something.
-  pub fn enrich(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+  pub fn enrich_server(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+    
+    Ok(())
+  }
+
+  // Responsible for using config values to generate the lower config fields which
+  // may not make sense to "parse" because they rely on multiple upper fields agreeing on something.
+  pub fn enrich_client(&mut self) -> Result<(), Box<dyn std::error::Error>> {
     
     Ok(())
   }
 
   // Accessors which use base data to construct richer types
-  pub fn get_listen_socket(&self) -> std::net::SocketAddr {
+  pub fn get_tcp_listen_socket(&self) -> std::net::SocketAddr {
     std::net::SocketAddr::new(self.server_listen_ip, self.server_listen_port)
   }
 
