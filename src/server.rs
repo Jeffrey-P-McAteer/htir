@@ -104,6 +104,8 @@ async fn udp_server_main(config: &config::Config) -> Result<(), Box<dyn std::err
 
   let mut udp_listener = UdpSocket::bind(udp_bind_socket).await?;
 
+  eprintln!("Listening on UDP {}", udp_bind_socket);
+
   for multicast_group in &config.server_multicast_groups {
     match multicast_group {
       std::net::IpAddr::V4(v4) => {
@@ -115,11 +117,6 @@ async fn udp_server_main(config: &config::Config) -> Result<(), Box<dyn std::err
     }
     eprintln!("Joined UDP group {}", multicast_group);
   }
-
-  //udp_listener.set_reuse_address(true)?;
-  //udp_listener.set_multicast_loop_v4(true)?;
-  
-  eprintln!("Listening on UDP {}", udp_bind_socket);
 
   let mut buf = [0; 16384]; // 16kb buffer should fit most payloads, but we OUGHT to assume it will never hold the full stream.
 
