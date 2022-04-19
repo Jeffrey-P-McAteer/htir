@@ -4,11 +4,11 @@ use std::path::{Path, PathBuf};
 use std::fs::File;
 use std::io::BufReader;
 use std::sync::Arc;
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 use tokio::runtime::{Builder};
-use tokio::net::{TcpListener, TcpStream};
+use tokio::net::{TcpListener, TcpStream, UdpSocket};
 use tokio::io::{ReadBuf, AsyncWriteExt};
-use tokio::time::timeout;
 
 use futures_util::{future, StreamExt, TryStreamExt};
 use futures_util::future::{poll_fn, join_all};
@@ -47,14 +47,9 @@ async fn server_main(config: &config::Config) -> Result<(), Box<dyn std::error::
   println!("server_main({:?})", config);
   
   let mut server_listen_futures: Vec<_> = vec![
-    tcp_server_main_opaque(config).boxed()
+    tcp_server_main_perr(config).boxed(),
+    udp_server_main_perr(config).boxed()
   ];
-
-  for group in &config.server_multicast_groups {
-    server_listen_futures.push(
-      udp_server_main_opaque(config, group.clone()).boxed()
-    );
-  }
 
   join_all(server_listen_futures).await; // block on all server functions
 
@@ -62,20 +57,20 @@ async fn server_main(config: &config::Config) -> Result<(), Box<dyn std::error::
   Ok(())
 }
 
-async fn tcp_server_main_opaque(config: &config::Config) {
+async fn tcp_server_main_perr(config: &config::Config) {
   if let Err(e) = tcp_server_main(config).await {
     eprintln!("tcp_server_main e={}", e);
   }
 }
 
 async fn tcp_server_main(config: &config::Config) -> Result<(), Box<dyn std::error::Error>> {
-  let tcp_listen_addr = config.get_tcp_listen_socket();
-  let tcp_listener = TcpListener::bind(&tcp_listen_addr).await?;
+  let tcp_listen_socket = config.get_tcp_listen_socket();
+  let tcp_listener = TcpListener::bind(&tcp_listen_socket).await?;
 
-  eprintln!("Listening on TCP {}", tcp_listen_addr);
+  eprintln!("Listening on TCP {}", tcp_listen_socket);
 
   loop {
-    match timeout(std::time::Duration::from_millis(500), tcp_listener.accept()).await {
+    match tokio::time::timeout(std::time::Duration::from_millis(250), tcp_listener.accept()).await {
       Ok(Ok((stream, remote_peer_addr))) => {
         tokio::spawn(async move {
           if let Err(e) = handle_tcp_connection(stream, remote_peer_addr).await {
@@ -86,24 +81,62 @@ async fn tcp_server_main(config: &config::Config) -> Result<(), Box<dyn std::err
       Ok(Err(e)) => {
         eprintln!("tcp_listener.accept().await loop e={:?}", e);
       }
-      Err(_e) => { // Timeouts get ignored
-        //eprintln!("tcp_listener.accept().await loop e={:?}", e);
-      }
+      Err(_e) => { } // Timeouts get ignored 
     }
   }
 
   //Ok(())
 }
 
-async fn udp_server_main_opaque(config: &config::Config, udp_listen_addr: std::net::IpAddr) {
-  if let Err(e) = udp_server_main(config, udp_listen_addr).await {
+async fn udp_server_main_perr(config: &config::Config) {
+  if let Err(e) = udp_server_main(config).await {
     eprintln!("udp_server_main e={}", e);
   }
 }
 
-async fn udp_server_main(config: &config::Config, udp_listen_addr: std::net::IpAddr) -> Result<(), Box<dyn std::error::Error>> {
+async fn udp_server_main(config: &config::Config) -> Result<(), Box<dyn std::error::Error>> {
+  let bind_iface_v6addr = IpAddr::V6( Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 0) );
+  let bind_iface_v6 = 0; // interface number
+  let bind_iface_v4addr = IpAddr::V4( Ipv4Addr::new(0, 0, 0, 0) );
+  let bind_iface_v4 = Ipv4Addr::new(0, 0, 0, 0);
 
-  Ok(())
+  let udp_bind_socket = std::net::SocketAddr::new( bind_iface_v6addr.clone(), config.server_listen_port);
+
+  let mut udp_listener = UdpSocket::bind(udp_bind_socket).await?;
+
+  for multicast_group in &config.server_multicast_groups {
+    match multicast_group {
+      std::net::IpAddr::V4(v4) => {
+        udp_listener.join_multicast_v4(v4.clone(), bind_iface_v4)?;
+      }
+      std::net::IpAddr::V6(v6) => {
+        udp_listener.join_multicast_v6(v6, bind_iface_v6)?;
+      }
+    }
+    eprintln!("Joined UDP group {}", multicast_group);
+  }
+
+  //udp_listener.set_reuse_address(true)?;
+  //udp_listener.set_multicast_loop_v4(true)?;
+  
+  eprintln!("Listening on UDP {}", udp_bind_socket);
+
+  let mut buf = [0; 16384]; // 16kb buffer should fit most payloads, but we OUGHT to assume it will never hold the full stream.
+
+  loop {
+    match tokio::time::timeout(std::time::Duration::from_millis(250), udp_listener.recv_from(&mut buf)).await {
+      Ok(Ok((amt, src))) => {
+        eprintln!("udp_listener.recv_from().await amt={:?} src={:?}", amt, src);
+
+      }
+      Ok(Err(e)) => {
+        eprintln!("udp_listener.recv_from().await loop e={:?}", e);
+      }
+      Err(_e) => { } // Timeouts get ignored 
+    }
+  }
+
+  //Ok(())
 }
 
 async fn handle_tcp_connection(mut stream: TcpStream, remote_peer_addr: SocketAddr) -> Result<(), Box<dyn std::error::Error>> {

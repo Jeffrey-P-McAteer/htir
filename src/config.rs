@@ -34,7 +34,10 @@ impl Default for Config {
       //server_listen_ip: IpAddr::V4( Ipv4Addr::new(0, 0, 0, 0) ),
       server_listen_ip: IpAddr::V6( Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 0) ), // Pretty much all OSes give us 0.0.0.0 ipv4 as well when ::/0 is specified.
       server_listen_port: 4430,
-      server_multicast_groups: vec![ IpAddr::V6( Ipv6Addr::new(0, 0, 0, 0, 0, 0, 0, 0) ), ],
+      server_multicast_groups: vec![
+        IpAddr::V6( Ipv6Addr::new(0xff15, 0x7079, 0x7468, 0x6f6e, 0x6465, 0x6d6f, 0x6d63, 0x6173) ),
+        IpAddr::V4( Ipv4Addr::new(225, 0, 0, 250) ),
+      ],
       server_ssl_cert_file: None,
       server_ssl_key_file: None,
       server_ssl_certs: vec![],
@@ -62,6 +65,7 @@ impl Config {
   pub fn get_tcp_listen_socket(&self) -> std::net::SocketAddr {
     std::net::SocketAddr::new(self.server_listen_ip, self.server_listen_port)
   }
+  
 
 }
 
