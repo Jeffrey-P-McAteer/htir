@@ -140,14 +140,14 @@ async fn handle_tcp_connection(mut stream: TcpStream, remote_peer_addr: SocketAd
   eprintln!("TCP client connected: {}", remote_peer_addr);
 
   // Is this a BARE stream or an HTTP stream or an HTTPS stream?
-  let mut buf = [0; 16384]; // 16kb buffer should fit most payloads, but we OUGHT to assume it will never hold the full stream.
-  let mut buf = ReadBuf::new(&mut buf);
+  let mut client_buf = [0; 16384]; // 16kb buffer should fit most payloads, but we OUGHT to assume it will never hold the full stream.
+  let mut read_buf = ReadBuf::new(&mut client_buf);
   
   poll_fn(|cx| {
-    stream.poll_peek(cx, &mut buf)
+    stream.poll_peek(cx, &mut read_buf)
   }).await?;
 
-  let peeked_bytes_from_client: &[u8] = buf.filled();
+  let peeked_bytes_from_client: &[u8] = read_buf.filled();
 
   // Test for unencrypted HTTP GET, http_get_beginning_bytes is "GET "
   let http_get_beginning_bytes: &[u8] = &[0x47, 0x45, 0x54, 0x20];
@@ -177,14 +177,18 @@ Location: https://{}
 
   // Now test if the first 16kb contains a BARE-encoded message we can understand
   // We use ServerTestStruct for now but later will use a better structure to decode.
-  match serde_bare::from_slice::<ServerTestStruct>(peeked_bytes_from_client) {
+  match serde_bare::from_slice::<ServerTestStruct>(&client_buf) {
     Ok(server_test_struct) => {
       eprintln!("serde_bare::from_slice server_test_struct={:?}", server_test_struct);
       // TODO
       return Ok(());
     }
     Err(e) => {
-      eprintln!("serde_bare::from_slice e={}", e);
+      eprintln!("serde_bare::from_slice e={:?}", e);
+      //let our_s = ServerTestStruct { b: 5 };
+      //let serialized = serde_bare::to_vec(&our_s)?;
+      //eprintln!("serialized={:?}", serialized);
+
     }
   }
 
@@ -235,7 +239,7 @@ fn load_keys(path: &Path) -> std::io::Result<Vec<PrivateKey>> {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 struct ServerTestStruct {
-  pub a: String,
+  //pub a: String,
   pub b: u64,
 
   //#[serde(with = "serde_bytes")]

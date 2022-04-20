@@ -29,7 +29,7 @@ bare = import_maybe_installing_with_pip('bare', pkg_name='pybare')
 from bare import Struct, Map, Str, UInt, Optional, DataFixed
 
 class ServerTestStruct(Struct):
-  a = Str()
+  #a = Str()
   b = UInt()
 
 
@@ -37,7 +37,8 @@ def main(args=sys.argv):
   tcp_bare_server = ('127.0.0.1', 4430)
   print('Sending a BARE message to {}'.format(tcp_bare_server))
 
-  s = ServerTestStruct(a="Hello BARE!", b=5)
+  #s = ServerTestStruct(a="Hello BARE!", b=5)
+  s = ServerTestStruct(b=5)
   
   message = s.pack()
 
@@ -45,11 +46,12 @@ def main(args=sys.argv):
 
   print('s={}'.format(s))
   print('message={}'.format(message))
-  print('s_roundabout={}'.format(s_roundabout))
-
+  print('message={}'.format([int(x) for x in message]))
+  print('message={}'.format([hex(x) for x in message]))
+  
   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   sock.connect(tcp_bare_server)
-  sock.sendall(message)
+  sock.sendall(message + (7 * b'\000') )
 
   # Wait for a reply
   data = sock.recv(1024)
