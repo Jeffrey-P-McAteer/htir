@@ -15,8 +15,12 @@ fn config_memory() {
 
 #[test]
 fn config_empty_file() {
-    let mut c = config::read_config(Some("/dev/null")); // TODO make test work on windorks as well
-    
+  let mut c = config::read_config(None);
+  
+  let mut c = config::read_config(Some("/dev/null")); // TODO make test work on windorks as well
+
+  
+
 
 }
 
