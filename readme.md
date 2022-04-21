@@ -151,6 +151,22 @@ The following builds windows `.exe` files on a windows host, macos mach-o and `.
 python -m btool
 ```
 
+Other btool utilities:
+
+```bash
+# Run unit tests & open browser to show un-tested lines of code
+python -m btool.coverage
+
+# Run a continuous build, executing the arguments as a command after new builds.
+# Great for tweaking constants!
+python -m btool.testcmd ./target/x86_64-unknown-linux-gnu/release/meili-server
+
+# Compile & upload release to github (requires github credentials)
+python -m btool.release
+
+
+```
+
 # Examples
 
 ## Example Config
