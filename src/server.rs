@@ -239,7 +239,7 @@ fn load_keys(path: &Path) -> std::io::Result<Vec<PrivateKey>> {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 struct ServerTestStruct {
-  //pub a: String,
+  pub a: String,
   pub b: u64,
 
   //#[serde(with = "serde_bytes")]
