@@ -176,8 +176,8 @@ Location: https://{}
   eprintln!("str::from_utf8(peeked_bytes_from_client)={:?}", std::str::from_utf8(peeked_bytes_from_client).unwrap_or("<UTF-8 Decode Error>") );
 
   // Now test if the first 16kb contains a BARE-encoded message we can understand
-  // We use ServerTestStruct for now but later will use a better structure to decode.
-  match serde_bare::from_slice::<ServerTestStruct>(&client_buf) {
+  // We use WireMessageOne for now but later will use a better structure to decode.
+  match serde_bare::from_slice::<WireMessageOne>(&client_buf) {
     Ok(server_test_struct) => {
       eprintln!("serde_bare::from_slice server_test_struct={:?}", server_test_struct);
       // TODO
@@ -185,9 +185,6 @@ Location: https://{}
     }
     Err(e) => {
       eprintln!("serde_bare::from_slice e={:?}", e);
-      //let our_s = ServerTestStruct { b: 5 };
-      //let serialized = serde_bare::to_vec(&our_s)?;
-      //eprintln!("serialized={:?}", serialized);
 
     }
   }
@@ -237,13 +234,23 @@ fn load_keys(path: &Path) -> std::io::Result<Vec<PrivateKey>> {
         .map(|mut keys| keys.drain(..).map(PrivateKey).collect())
 }
 
+// All Meili messages begin with a u64's worth of flags, and WireMessageZero exists so we can
+// use the flags to allow backwards-compatible breaking message changes.
+// We parse as WireMessageZero first, read the flags, then re-parse as whatever completely different
+// message format the client has specified.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-struct ServerTestStruct {
-  pub a: String,
-  pub b: u64,
+struct WireMessageZero {
+  pub flags: u64,
+}
 
-  //#[serde(with = "serde_bytes")]
-  //pub b: Vec<u8>,
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+struct WireMessageOne {
+  pub flags: u64,
+
+  pub sn: String,  // Server Name
+  pub db: String,  // Database Name
+  pub sql: String, // SQL payload
+
 }
 
 
