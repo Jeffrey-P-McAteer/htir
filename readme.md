@@ -164,6 +164,9 @@ python -m btool.testcmd ./target/x86_64-unknown-linux-gnu/release/meili-server
 # Compile & upload release to github (requires github credentials)
 python -m btool.release
 
+# Generate graphics from ditaa MFCD (requires ditaa installed)
+python -m btool.gen_mfcd
+
 
 ```
 
