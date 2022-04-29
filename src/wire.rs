@@ -4,10 +4,10 @@ use crate::*;
 // WireMessage wraps all other messages; we use `flags` to
 // determine how inner should be decoded.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct WireMessageHeader<'a> {
+pub struct WireMessageHeader {
   pub msg_flags: u64,
   #[serde(with = "serde_bytes")]
-  pub inner: &'a [u8],
+  pub inner: Vec<u8>,
 }
 
 impl WireMessageHeader {
@@ -18,7 +18,7 @@ impl WireMessageHeader {
 
 #[derive(Debug, Clone)]
 pub enum WireMessage {
-
+  One(WireMessageOne),
 }
 
 impl WireMessage {
@@ -27,7 +27,7 @@ impl WireMessage {
     let header = serde_bare::from_slice::<WireMessageHeader>(bytes)?;
     match header.get_msg_num() {
       0 => {
-        std::unimplemented!()
+        return Ok(WireMessage::One(serde_bare::from_slice::<WireMessageOne>(&header.inner)?));
       }
       unk => {
         return Err(error::MeiliError::new_boxed(""));
@@ -35,7 +35,14 @@ impl WireMessage {
     }
   }
   pub fn add_header(&self) -> WireMessageHeader {
-    std::unimplemented!()
+    match self {
+      WireMessage::One(wire_msg_one) => {
+        std::unimplemented!()
+      }
+      _ => {
+        std::unimplemented!()
+      }
+    }
   }
 }
 
