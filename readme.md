@@ -26,7 +26,7 @@ This repository holds
     - Write arbitrary rows to a table
     - Given a server(s) & table & a condition, poll until condition is met (with possible server-side assistance via websocket)
 
-The goal is to do what the world tried to do with html but better:
+The goal is to do what the world tried to do with http/html but better:
 lower-latency protocols, encryption everywhere, machine-processable data by default,
 and federation baked in (aka "I'm querying the server hitr.example.edu but if that server is part of a network return values from those servers as well").
 
@@ -79,8 +79,8 @@ Benefits which _could_ be designed in but are explicitly _not_:
 
 ## Server
 
- - read system-wide `/etc/htir.ucl.conf` file
- - read per-user `$XDG_CONFIG_HOME/htir.ucl.conf` file (where if unset `$XDG_CONFIG_HOME` defaults to `$HOME/.config`)
+ - read system-wide `/etc/htir.toml` file
+ - read per-user `$XDG_CONFIG_HOME/htir.toml` file (where if unset `$XDG_CONFIG_HOME` defaults to `$HOME/.config`)
  - Bind to `::/0` (or config IP addr) UDP port `9315`, TCP port `9315`, and unix socket `/tmp/htir.$N.sock` where `$N` is the PID of the server.
  - for UDP:
     - Incoming connections should be unencrypted CBOR data containing either:
