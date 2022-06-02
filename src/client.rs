@@ -36,12 +36,93 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 async fn cli_main(url: &str, _args: &Args) {
   println!("Hello async cli_main runtime! url={:?}", url);
 
-  // Test access to OpenPGP credentials.
-  // This should cover a ton of useful identity management systems.
+  visit_openpgp_cards();
+  visit_pcsc_cards();
+  visit_fido_keys();
 
+
+
+}
+
+
+fn visit_fido_keys() {
+  use authenticator;
+  use sha2::{Digest, Sha256};
+
+  println!("=== visit_fido_keys ===");
+
+  let mut manager = authenticator::authenticatorservice::AuthenticatorService::new().expect("The auth service should initialize safely");
+
+  manager.add_u2f_usb_hid_platform_transports();
+
+  println!("Asking a security key to register now...");
+  let challenge_str = format!(
+      "{}{}",
+      r#"{"challenge": "1vQ9mxionq0ngCnjD-wTsv1zUSrGRtFqG2xP09SbZ70","#,
+      r#" "version": "U2F_V2", "appId": "http://demo.yubico.com"}"#
+  );
+  let mut challenge = Sha256::default();
+  challenge.input(challenge_str.as_bytes());
+  let chall_bytes = challenge.result().to_vec();
+
+  let mut application = Sha256::default();
+  application.input(b"http://demo.yubico.com");
+  let app_bytes = application.result().to_vec();
+
+  let flags = authenticator::RegisterFlags::empty();
+
+  let timeout_ms = 32000;
+
+  let (status_tx, status_rx) = std::sync::mpsc::channel::<authenticator::StatusUpdate>();
+  std::thread::spawn(move || loop {
+      match status_rx.recv() {
+          Ok(authenticator::StatusUpdate::DeviceAvailable { dev_info }) => {
+              // println!("STATUS: device available: {}", dev_info)
+          }
+          Ok(authenticator::StatusUpdate::DeviceUnavailable { dev_info }) => {
+              // println!("STATUS: device unavailable: {}", dev_info)
+          }
+          Ok(authenticator::StatusUpdate::Success { dev_info }) => {
+              // println!("STATUS: success using device: {}", dev_info);
+          }
+          Err(RecvError) => {
+              // println!("STATUS: end");
+              return;
+          }
+      }
+  });
+
+  let (register_tx, register_rx) = std::sync::mpsc::channel();
+  let callback = authenticator::statecallback::StateCallback::new(Box::new(move |rv| {
+      register_tx.send(rv).unwrap();
+  }));
+
+  manager
+      .register(
+          flags,
+          timeout_ms,
+          chall_bytes.clone(),
+          app_bytes.clone(),
+          vec![],
+          status_tx.clone(),
+          callback,
+      )
+      .expect("Couldn't register");
+
+  let register_result = register_rx
+      .recv()
+      .expect("Problem receiving, unable to continue");
+  let (register_data, device_info) = register_result.expect("Registration failed");
+
+  println!("Device info: {}", &device_info);
+
+}
+
+fn visit_openpgp_cards() {
   //use openpgp_card::OpenPgp;
   //use openpgp_card_pcsc::PcscBackend;
   use openpgp_card::CardBackend;
+  println!("=== visit_openpgp_cards ===");
 
   for mode in [Some(pcsc::ShareMode::Exclusive), Some(pcsc::ShareMode::Shared), None, /* Some(pcsc::ShareMode::Direct) */ ] {
     println!("Querying for pcsc cards in mode={:?}", mode);
@@ -74,9 +155,13 @@ async fn cli_main(url: &str, _args: &Args) {
       }
     }
   }
+}
 
-  // Test access to _other_ credentials
+fn visit_pcsc_cards() {
   use pcsc;
+  
+  println!("=== visit_pcsc_cards ===");
+
   let ctx = match pcsc::Context::establish(pcsc::Scope::User) {
         Ok(ctx) => ctx,
         Err(err) => {
@@ -114,11 +199,8 @@ async fn cli_main(url: &str, _args: &Args) {
           }
       }
     }
-
-
-
-
 }
+
 
 async fn gui_main(args: &Args) {
   println!("Hello async gui_main runtime!");
