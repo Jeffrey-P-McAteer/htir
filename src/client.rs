@@ -43,8 +43,8 @@ async fn cli_main(url: &str, _args: &Args) {
   //use openpgp_card_pcsc::PcscBackend;
   use openpgp_card::CardBackend;
 
-  for mode in [Some(pcsc::ShareMode::Exclusive), Some(pcsc::ShareMode::Shared), None, Some(pcsc::ShareMode::Direct)] {
-    println!("Querying for cards in mode={:?}", mode);
+  for mode in [Some(pcsc::ShareMode::Exclusive), Some(pcsc::ShareMode::Shared), None, /* Some(pcsc::ShareMode::Direct) */ ] {
+    println!("Querying for pcsc cards in mode={:?}", mode);
     match openpgp_card_pcsc::PcscBackend::cards(mode) {
       Ok(cards) => {
         println!("Got {} cards:", cards.len());
@@ -74,6 +74,49 @@ async fn cli_main(url: &str, _args: &Args) {
       }
     }
   }
+
+  // Test access to _other_ credentials
+  use pcsc;
+  let ctx = match pcsc::Context::establish(pcsc::Scope::User) {
+        Ok(ctx) => ctx,
+        Err(err) => {
+            eprintln!("Failed to establish pcsc context: {}", err);
+            return;
+        }
+    };
+
+    // List available readers.
+    let mut readers_buf = [0; 4096];
+    let mut readers = match ctx.list_readers(&mut readers_buf) {
+        Ok(readers) => readers,
+        Err(err) => {
+            eprintln!("Failed to list pcsc readers: {}", err);
+            return;
+        }
+    };
+
+    for reader in readers {
+      match ctx.connect(reader, pcsc::ShareMode::Shared, pcsc::Protocols::ANY) {
+          Ok(card) => {
+            println!("got a card!");
+            if let Ok(status) = card.status2_owned() {
+              println!("card atr = {:?}", status.atr() );
+              println!("card atr string = {:?}", String::from_utf8_lossy( status.atr() ) );
+            }
+          },
+          Err(pcsc::Error::NoSmartcard) => {
+              println!("A smartcard is not present in the reader.");
+              return;
+          }
+          Err(err) => {
+              eprintln!("Failed to connect to card: {}", err);
+              return;
+          }
+      }
+    }
+
+
+
 
 }
 
